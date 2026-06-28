@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rose: #C8547A;
+  --gold: #C9A96E;
+  --dark: #1A1118;
+  --dark-card: #2A1F28;
+  --dark-border: #3D2B3A;
+  --dark-surface: #231A21;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #1A1118;
+  color: #F5E6F0;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-cormorant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.text-gradient-rose-gold {
+  background: linear-gradient(135deg, var(--rose) 0%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.border-gradient {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--dark-card), var(--dark-card)) padding-box,
+              linear-gradient(135deg, var(--rose), var(--gold)) border-box;
+}
+
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(200, 84, 122, 0.15);
+}
+
+.btn-primary {
+  @apply bg-rose hover:bg-rose-dark text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-rose/20;
+}
+
+.btn-secondary {
+  @apply border border-rose/30 text-rose hover:bg-rose/10 font-medium px-6 py-3 rounded-xl transition-all duration-200;
+}
+
+.btn-gold {
+  @apply bg-gold hover:bg-gold-dark text-dark font-medium px-6 py-3 rounded-xl transition-all duration-200;
+}
+
+.input-dark {
+  @apply bg-dark-surface border border-dark-border text-white placeholder-white/30 rounded-xl px-4 py-3 focus:outline-none focus:border-rose/50 transition-colors w-full;
+}
+
+.badge-premium {
+  @apply bg-gradient-to-r from-gold to-yellow-600 text-dark text-xs font-semibold px-2 py-0.5 rounded-full;
+}
+
+.badge-verified {
+  @apply bg-rose/10 text-rose text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1A1118; }
+::-webkit-scrollbar-thumb { background: #3D2B3A; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rose); }
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #231A21 25%, #3D2B3A 50%, #231A21 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

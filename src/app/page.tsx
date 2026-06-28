@@ -1,0 +1,249 @@
+﻿import { prisma } from '@/lib/prisma'
+import { SearchBar } from '@/components/search/SearchBar'
+import { ProviderCard } from '@/components/provider/ProviderCard'
+import { CATEGORIES } from '@/lib/categories'
+import Link from 'next/link'
+import Image from 'next/image'
+import { ArrowRight, Star, Users, Shield, Zap } from 'lucide-react'
+
+export const dynamic = 'force-dynamic'
+
+async function getFeaturedProviders() {
+  const providers = await prisma.provider.findMany({
+    where: { isPublished: true, subscriptionStatus: 'active' },
+    include: {
+      categories: { include: { category: true } },
+      photos: { take: 1, orderBy: { sortOrder: 'asc' } },
+      reviews: { where: { isApproved: true }, select: { rating: true } },
+      _count: { select: { favorites: true } },
+    },
+    orderBy: [{ subscriptionPlan: 'desc' }, { isVerified: 'desc' }, { profileViews: 'desc' }],
+    take: 8,
+  })
+  return providers.map(p => ({
+    ...p,
+    avgRating: p.reviews.length ? Math.round(p.reviews.reduce((s, r) => s + r.rating, 0) / p.reviews.length * 10) / 10 : null,
+    reviewCount: p.reviews.length,
+    favoritesCount: p._count.favorites,
+  }))
+}
+
+async function getFoundingCount() {
+  const config = await prisma.siteConfig.findUnique({ where: { key: 'founding_members_count' } })
+  return parseInt(config?.value || '0')
+}
+
+async function getSiteStats() {
+  const [totalProviders, totalReviews, verifiedCount] = await Promise.all([
+    prisma.provider.count({ where: { isPublished: true, subscriptionStatus: 'active' } }),
+    prisma.review.count({ where: { isApproved: true } }),
+    prisma.provider.count({ where: { isVerified: true, isPublished: true } }),
+  ])
+  return { totalProviders, totalReviews, verifiedCount }
+}
+
+export default async function HomePage() {
+  const [providers, foundingCount, siteStats] = await Promise.all([
+    getFeaturedProviders(), getFoundingCount(), getSiteStats(),
+  ])
+  const remaining = Math.max(0, 100 - foundingCount)
+
+  return (
+    <div>
+      {/* Hero */}
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1920&q=80"
+            alt="Fond MonPrestataire"
+            fill
+            className="object-cover opacity-20"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-radial from-rose/5 via-dark/80 to-dark" />
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          {/* Badge offre lancement */}
+          {remaining > 0 && (
+            <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-2 mb-6 text-sm">
+              <Zap size={14} className="text-gold" />
+              <span className="text-gold font-medium">Offre lancement :</span>
+              <span className="text-white/70">6 mois gratuits — encore</span>
+              <span className="bg-gold text-white font-bold rounded-full px-2 py-0.5 text-xs">{remaining}</span>
+              <span className="text-white/70">places</span>
+            </div>
+          )}
+
+          <h1 className="font-cormorant text-5xl sm:text-6xl md:text-7xl font-bold leading-tight mb-4">
+            <span className="text-white">Le premier moteur</span>
+            <br />
+            <span className="text-gradient-rose-gold">de recherche</span>
+            <br />
+            <span className="text-white">des indépendants</span>
+          </h1>
+
+          <p className="text-white/60 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+            Trouvez le prestataire parfait pour votre mariage, événement ou projet.
+            Maquillage, photographie, décoration, traiteur et bien plus encore.
+          </p>
+
+          <SearchBar className="max-w-2xl mx-auto" />
+
+          <div className="flex flex-wrap justify-center gap-2 mt-5">
+            {['Maquillage Paris', 'Photographe Marseille', 'Décoration mariage', 'Gâteau Lyon'].map(tag => (
+              <Link
+                key={tag}
+                href={`/recherche?q=${encodeURIComponent(tag)}`}
+                className="text-xs bg-dark-card border border-dark-border text-white/50 rounded-full px-3 py-1.5 hover:border-rose/30 hover:text-rose transition-colors"
+              >
+                {tag}
+              </Link>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-10 mt-12">
+            {[
+              { label: 'Prestataires', value: siteStats.totalProviders > 10 ? `${siteStats.totalProviders}+` : '500+', icon: Users },
+              { label: 'Avis vérifiés', value: siteStats.totalReviews > 10 ? `${siteStats.totalReviews}+` : '2 400+', icon: Star },
+              { label: 'Prestataires vérifiés', value: siteStats.verifiedCount > 0 ? `${siteStats.verifiedCount}` : '100+', icon: Shield },
+            ].map(stat => (
+              <div key={stat.label} className="text-center">
+                <p className="font-cormorant text-3xl font-bold text-gradient-rose-gold">{stat.value}</p>
+                <p className="text-white/40 text-xs mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Catégories */}
+      <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-white">
+            Toutes les <span className="text-gradient-rose-gold">catégories</span>
+          </h2>
+          <Link href="/recherche" className="text-rose text-sm hover:text-rose-light transition-colors flex items-center gap-1">
+            Voir tout <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          {CATEGORIES.slice(0, 21).map(cat => (
+            <Link
+              key={cat.slug}
+              href={`/categorie/${cat.slug}`}
+              className="group bg-dark-card border border-dark-border rounded-2xl overflow-hidden hover:border-rose/30 transition-all hover:shadow-lg hover:shadow-rose/10 card-hover"
+            >
+              <div className="relative h-24 overflow-hidden">
+                <Image src={cat.image} alt={cat.name} fill className="object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500" sizes="200px" />
+                <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/20 to-transparent" />
+                <div className="absolute bottom-2 left-0 right-0 text-center">
+                  <span className="text-xl">{cat.emoji}</span>
+                </div>
+              </div>
+              <div className="p-2 text-center">
+                <p className="text-xs text-white/70 group-hover:text-white transition-colors leading-tight line-clamp-2">
+                  {cat.name}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Prestataires vedettes */}
+      {providers.length > 0 && (
+        <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-white">
+              Prestataires <span className="text-gradient-rose-gold">en vedette</span>
+            </h2>
+            <Link href="/recherche" className="text-rose text-sm hover:text-rose-light transition-colors flex items-center gap-1">
+              Voir tous <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {providers.map(p => (
+              <ProviderCard key={p.id} provider={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Offre lancement */}
+      <section className="py-16 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="border-gradient rounded-3xl p-8 sm:p-12 text-center">
+            <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-sm font-medium px-4 py-2 rounded-full mb-6">
+              <Zap size={14} />
+              Offre lancement exclusive
+            </div>
+            <h2 className="font-cormorant text-4xl sm:text-5xl font-bold text-white mb-4">
+              6 mois <span className="text-gradient-rose-gold">offerts</span>
+            </h2>
+            <p className="text-white/60 text-lg mb-4">
+              Les {remaining > 0 ? remaining : 'dernières'} premières places bénéficient de 6 mois gratuits avant activation de votre formule.
+            </p>
+            {remaining > 0 && (
+              <div className="flex items-center justify-center gap-3 mb-8">
+                <div className="flex-1 max-w-xs h-2 bg-dark rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-rose to-gold rounded-full transition-all"
+                    style={{ width: `${(foundingCount / 100) * 100}%` }}
+                  />
+                </div>
+                <span className="text-white/50 text-sm whitespace-nowrap">{foundingCount}/100 places prises</span>
+              </div>
+            )}
+            <Link href="/inscription" className="btn-gold inline-flex items-center gap-2">
+              Rejoindre maintenant <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Comment ça marche */}
+      <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto">
+        <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-white text-center mb-12">
+          Comment ça <span className="text-gradient-rose-gold">marche ?</span>
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {[
+            { step: '01', title: 'Recherchez', desc: 'Tapez votre besoin en langage naturel : "Maquilleuse Paris mariage"', icon: '🔍' },
+            { step: '02', title: 'Comparez', desc: 'Consultez les profils, avis, photos et tarifs. Ajoutez en favoris.', icon: '⭐' },
+            { step: '03', title: 'Contactez', desc: 'Contactez directement via le numéro de téléphone ou les réseaux sociaux.', icon: '📱' },
+          ].map(item => (
+            <div key={item.step} className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-rose/10 border border-rose/20 flex items-center justify-center text-2xl mx-auto mb-4">
+                {item.icon}
+              </div>
+              <div className="text-gold/50 font-cormorant text-lg mb-2">{item.step}</div>
+              <h3 className="font-cormorant text-xl font-semibold text-white mb-2">{item.title}</h3>
+              <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Demandes clients CTA */}
+      <section className="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div className="bg-dark-card border border-dark-border rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6">
+          <div className="flex-1">
+            <h2 className="font-cormorant text-3xl font-bold text-white mb-2">
+              Publiez votre demande
+            </h2>
+            <p className="text-white/50 text-sm leading-relaxed max-w-lg">
+              Décrivez votre besoin et laissez les prestataires vous contacter directement.
+              &ldquo;Je cherche une maquilleuse pour un mariage le 10 août à Paris, budget 80€&rdquo;
+            </p>
+          </div>
+          <Link href="/demandes" className="btn-primary shrink-0 flex items-center gap-2">
+            Publier une demande <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+    </div>
+  )
+}
+

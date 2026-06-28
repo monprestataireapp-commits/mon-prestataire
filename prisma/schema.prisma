@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Dev local: sqlite / Production: changer en "postgresql"
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("CLIENT") // CLIENT | PROVIDER | ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  provider      Provider?
+  favorites     Favorite[]
+  clientRequests ClientRequest[]
+  reviews       Review[]
+}
+
+model Provider {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Infos de base
+  businessName      String
+  slug              String   @unique
+  description       String
+  profilePhoto      String?
+  coverPhoto        String?
+
+  // Localisation
+  country           String   @default("FR") // FR | BE | CH (extensible)
+  region            String
+  department        String
+  departmentCode    String?
+  city              String
+
+  // Contact
+  phone             String?
+  website           String?
+  instagramUrl      String?
+  tiktokUrl         String?
+  instagramToken    String?  // Token API Instagram
+
+  // Disponibilité
+  isAvailableToday  Boolean  @default(false)
+  responseTime      String?  // "< 15 min" | "< 1h" | "< 24h"
+  availabilityNotes String?
+  yearsExperience   Int?
+
+  // Livraison
+  hasDelivery       Boolean  @default(false)
+  deliveryZone      String?  // "france" | "region" | "city"
+  deliveryFee       String?  // "gratuit" | "5" | "selon_commande"
+  hasHandDelivery   Boolean  @default(false)
+
+  // Statut
+  isVerified        Boolean  @default(false)
+  isPublished       Boolean  @default(false)
+  adminNotes        String?
+
+  // Abonnement
+  subscriptionPlan  String?  // "standard" | "premium"
+  subscriptionStatus String? // "active" | "canceled" | "past_due" | "trialing"
+  subscriptionEndsAt DateTime?
+  stripeCustomerId  String?
+  stripeSubscriptionId String?
+  trialEndsAt       DateTime?
+  isFoundingMember  Boolean  @default(false)
+
+  // Spécialités (JSON array de strings)
+  specialties       String   @default("[]")
+
+  // Tarifs
+  priceMin          Int?     // Prix minimum en euros
+  priceMax          Int?     // Prix maximum en euros
+
+  // Vérification
+  verificationRequested Boolean @default(false)
+  verificationRequestedAt DateTime?
+
+  // Stats
+  profileViews      Int      @default(0)
+  profileClicks     Int      @default(0)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  categories        ProviderCategory[]
+  photos            ProviderPhoto[]
+  videos            ProviderVideo[]
+  reviews           Review[]
+  favorites         Favorite[]
+  requestResponses  RequestResponse[]
+  stats             ProviderStat[]
+}
+
+model Category {
+  id          String @id @default(cuid())
+  name        String @unique
+  slug        String @unique
+  emoji       String
+  description String?
+  imageUrl    String?
+  sortOrder   Int    @default(0)
+
+  providers   ProviderCategory[]
+}
+
+model ProviderCategory {
+  providerId  String
+  categoryId  String
+  provider    Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([providerId, categoryId])
+}
+
+model ProviderPhoto {
+  id         String   @id @default(cuid())
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  url        String
+  caption    String?
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model ProviderVideo {
+  id         String   @id @default(cuid())
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  url        String
+  thumbnail  String?
+  caption    String?
+  createdAt  DateTime @default(now())
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  providerId  String
+  provider    Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int       // 1-5
+  comment     String
+  isApproved  Boolean   @default(false)
+  reply       String?
+  repliedAt   DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Favorite {
+  userId     String
+  providerId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([userId, providerId])
+}
+
+model ClientRequest {
+  id           String   @id @default(cuid())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  title        String
+  description  String
+  categoryId   String?
+  city         String?
+  region       String?
+  budget       Float?
+  eventDate    DateTime?
+  isPublished       Boolean  @default(true)
+  contactName       String?
+  contactEmail      String?
+  contactPhone      String?
+  targetProviderId  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  responses    RequestResponse[]
+}
+
+model RequestResponse {
+  id         String        @id @default(cuid())
+  requestId  String
+  request    ClientRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  providerId String
+  provider   Provider      @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  message    String
+  price      Float?
+  createdAt  DateTime      @default(now())
+}
+
+model ProviderStat {
+  id         String   @id @default(cuid())
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  date       DateTime @default(now())
+  views      Int      @default(0)
+  clicks     Int      @default(0)
+  favorites  Int      @default(0)
+
+  @@unique([providerId, date])
+}
+
+model SiteConfig {
+  key   String @id
+  value String
+}

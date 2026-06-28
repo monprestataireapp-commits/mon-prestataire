@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_in_Chrome__read_page",
+      "mcp__Claude_in_Chrome__javascript_tool",
+      "mcp__Claude_in_Chrome__find",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "mcp__Claude_in_Chrome__select_browser",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__get_page_text",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "mcp__Claude_in_Chrome__gif_creator",
+      "Bash(xargs sed -i 's/monprestataire\\\\.fr/mon-prestataire.fr/g')",
+      "Bash(Start-Process node *)",
+      "Bash(node \"C:\\\\Users\\\\leilo\\\\AppData\\\\Local\\\\Temp\\\\shopify_oauth2.js\")",
+      "Bash(npm init *)",
+      "Bash(npx shopify@latest auth)",
+      "Bash(npx shopify@latest app --help)",
+      "Bash(npx shopify@latest app env show --help)",
+      "Bash(npx shopify@latest app dev --store diasporaparis --client-id c5d817c823cd0c13e289e7499604967b)",
+      "mcp__Claude_in_Chrome__tabs_create_mcp",
+      "mcp__Claude_in_Chrome__read_network_requests",
+      "Bash(xargs grep -l \"étape\\\\|step\\\\|inscription\\\\|prestataire\" -i)"
+    ]
+  }
+}
