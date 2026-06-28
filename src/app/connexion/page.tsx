@@ -70,7 +70,7 @@ export default function ConnexionPage() {
 
           <p className="text-center text-white/40 text-sm mt-6">
             Pas encore de compte ?{' '}
-            <Link href="/inscription" className="text-rose hover:underline">S&apos;inscrire</Link>
+            <Link href="/inscription-client" className="text-rose hover:underline">S&apos;inscrire</Link>
           </p>
         </div>
       </div>
