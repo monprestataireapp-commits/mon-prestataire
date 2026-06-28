@@ -1,6 +1,6 @@
 export const CATEGORIES = [
   { slug: 'maquillage-beaute', name: 'Maquillage & Beauté', emoji: '💄', description: 'Maquillage, browlift, rehaussement de cils, maquillage permanent, relooking…', image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&q=80', sortOrder: 1 },
-  { slug: 'coiffure-onglerie', name: 'Coiffure & Onglerie', emoji: '💇‍♀️', description: 'Coiffure, coiffure à domicile, poses d\'ongles, nail art…', image: 'https://images.unsplash.com/photo-1560066984-138daaa7a86c?w=400&q=80', sortOrder: 2 },
+  { slug: 'coiffure-onglerie', name: 'Coiffure & Onglerie', emoji: '💇‍♀️', description: 'Coiffure, coiffure à domicile, poses d\'ongles, nail art…', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80', sortOrder: 2 },
   { slug: 'esthetique-bien-etre', name: 'Esthétique & Bien-être', emoji: '🧖‍♀️', description: 'Soins du visage, massages, épilation, soins du corps…', image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&q=80', sortOrder: 3 },
   { slug: 'gateaux-sucreries', name: 'Gâteaux & Sucreries', emoji: '🎂', description: 'Wedding cakes, gâteaux personnalisés, candy bar, macarons…', image: 'https://images.unsplash.com/photo-1535141192574-5d4897c12636?w=400&q=80', sortOrder: 4 },
   { slug: 'photographie', name: 'Photographie', emoji: '📸', description: 'Photo mariage, portrait, famille, événement, packshots…', image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&q=80', sortOrder: 5 },
