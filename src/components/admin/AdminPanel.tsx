@@ -5,13 +5,14 @@ import Image from 'next/image'
 import { CheckCircle, XCircle, Eye, EyeOff, Shield, Users, Zap, Star, MessageSquare, Mail, Download, BarChart2, TrendingUp, Trash2, ExternalLink, UserPlus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-type Tab = 'stats' | 'providers' | 'reviews' | 'newsletter'
+type Tab = 'stats' | 'providers' | 'clients' | 'reviews' | 'newsletter'
 
 const EMPTY_FORM = { name: '', email: '', password: '', businessName: '', city: '', region: '', months: '6' }
 
 export function AdminPanel() {
   const [tab, setTab] = useState<Tab>('stats')
   const [providers, setProviders] = useState<any[]>([])
+  const [clients, setClients] = useState<any[]>([])
   const [reviews, setReviews] = useState<any[]>([])
   const [newsletters, setNewsletters] = useState<string[]>([])
   const [foundingCount, setFoundingCount] = useState(0)
@@ -31,17 +32,19 @@ export function AdminPanel() {
 
   async function loadData() {
     setLoading(true)
-    const [pRes, rRes, nRes, sRes] = await Promise.all([
+    const [pRes, rRes, nRes, sRes, cRes] = await Promise.all([
       fetch('/api/admin/providers').then(r => r.json()),
       fetch('/api/admin/reviews').then(r => r.json()),
       fetch('/api/admin/newsletter').then(r => r.json()),
       fetch('/api/admin/stats').then(r => r.json()),
+      fetch('/api/admin/clients').then(r => r.json()),
     ])
     setProviders(pRes.providers || [])
     setFoundingCount(pRes.foundingCount || 0)
     setReviews(rRes.reviews || [])
     setNewsletters(nRes.emails || [])
     setGlobalStats(sRes)
+    setClients(cRes.clients || [])
     setLoading(false)
   }
 
@@ -211,6 +214,12 @@ export function AdminPanel() {
             tab === 'providers' ? 'bg-rose text-white' : 'bg-dark-card border border-dark-border text-white/60 hover:border-rose/30'
           )}>
           <Users size={14} /> Prestataires ({providers.length})
+        </button>
+        <button onClick={() => setTab('clients')}
+          className={cn('flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors',
+            tab === 'clients' ? 'bg-rose text-white' : 'bg-dark-card border border-dark-border text-white/60 hover:border-rose/30'
+          )}>
+          <Users size={14} /> Clients ({clients.length})
         </button>
         <button onClick={() => setTab('reviews')}
           className={cn('flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors',
@@ -400,6 +409,50 @@ export function AdminPanel() {
             )}
           </div>
         </>
+      ) : tab === 'clients' ? (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-white/50 text-sm">{clients.length} clients inscrits</p>
+            <button
+              onClick={() => {
+                const header = 'Nom;Email;Demandes;Date inscription\n'
+                const rows = clients.map((c: any) => [c.name, c.email, c._count?.clientRequests || 0, new Date(c.createdAt).toLocaleDateString('fr-FR')].join(';')).join('\n')
+                const blob = new Blob(['﻿' + header + rows], { type: 'text/csv;charset=utf-8;' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a'); a.href = url; a.download = 'clients.csv'; a.click()
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-card border border-dark-border text-white/60 text-sm hover:border-rose/30 transition-colors"
+            >
+              <Download size={13} /> Exporter CSV
+            </button>
+          </div>
+          {clients.map((c: any) => (
+            <div key={c.id} className="bg-dark-card border border-dark-border rounded-2xl p-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-blue-400/10 flex items-center justify-center text-blue-400 font-bold text-sm">
+                  {c.name?.[0]?.toUpperCase() || '?'}
+                </div>
+                <div>
+                  <p className="text-white font-medium text-sm">{c.name}</p>
+                  <p className="text-white/40 text-xs">{c.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-6 text-right">
+                <div>
+                  <p className="text-white text-sm font-medium">{c._count?.clientRequests || 0}</p>
+                  <p className="text-white/40 text-xs">demandes</p>
+                </div>
+                <div>
+                  <p className="text-white/60 text-xs">{new Date(c.createdAt).toLocaleDateString('fr-FR')}</p>
+                  <p className="text-white/40 text-xs">inscription</p>
+                </div>
+              </div>
+            </div>
+          ))}
+          {clients.length === 0 && (
+            <div className="text-center py-12 text-white/30">Aucun client inscrit</div>
+          )}
+        </div>
       ) : tab === 'reviews' ? (
         /* Avis à modérer */
         <div className="space-y-3">

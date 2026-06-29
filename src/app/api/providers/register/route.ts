@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { slugify } from '@/lib/utils'
-import { sendWelcomeEmail } from '@/lib/email'
+import { sendWelcomeEmail, sendAdminNewUserEmail } from '@/lib/email'
 import { rateLimit, getIp } from '@/lib/rateLimit'
 
 export async function POST(req: NextRequest) {
@@ -85,9 +85,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Email de bienvenue (non bloquant)
     const isFoundingMember = user.provider?.isFoundingMember || false
     sendWelcomeEmail(email, name || businessName, isFoundingMember).catch(() => {})
+    sendAdminNewUserEmail('provider', name || businessName, email, `<strong>Ville :</strong> ${city || '—'}<br><strong>Activité :</strong> ${businessName}`).catch(() => {})
 
     return NextResponse.json({ success: true, slug: user.provider?.slug })
   } catch (err) {

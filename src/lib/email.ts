@@ -157,6 +157,61 @@ export async function sendSubscriptionConfirmEmail(
   })
 }
 
+export async function sendWelcomeClientEmail(email: string, name: string) {
+  await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: 'Bienvenue sur MonPrestataire !',
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#1A1118;color:#fff;border-radius:16px;padding:32px">
+        <h1 style="font-family:Georgia,serif;font-size:28px;color:#C8547A;margin:0 0 8px">MonPrestataire</h1>
+        <h2 style="font-size:20px;margin:0 0 16px">Bienvenue, ${name} !</h2>
+        <p style="color:rgba(255,255,255,0.6);line-height:1.6">Votre compte client a bien été créé. Vous pouvez maintenant :</p>
+        <div style="background:#231820;border-radius:12px;padding:16px;margin:20px 0">
+          <p style="color:rgba(255,255,255,0.6);font-size:14px;margin:0;line-height:1.8">
+            🔍 Rechercher des prestataires près de chez vous<br>
+            📩 Envoyer des demandes de devis directement<br>
+            ❤️ Sauvegarder vos prestataires favoris<br>
+            ⭐ Laisser des avis après vos prestations
+          </p>
+        </div>
+        <a href="${BASE_URL}/recherche" style="display:inline-block;background:#C8547A;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:600">
+          Trouver un prestataire
+        </a>
+        <p style="color:rgba(255,255,255,0.3);font-size:12px;margin-top:24px">Gérez votre compte depuis <a href="${BASE_URL}/espace-client" style="color:#C8547A">votre espace client</a>.</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendAdminNewUserEmail(type: 'provider' | 'client', name: string, email: string, extra?: string) {
+  const adminEmail = process.env.ADMIN_EMAIL
+  if (!adminEmail) return
+  const typeLabel = type === 'provider' ? 'Prestataire' : 'Client'
+  const icon = type === 'provider' ? '🛠️' : '👤'
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `${icon} Nouvelle inscription ${typeLabel} — MonPrestataire`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#1A1118;color:#fff;border-radius:16px;padding:32px">
+        <h1 style="font-family:Georgia,serif;font-size:28px;color:#C8547A;margin:0 0 8px">MonPrestataire</h1>
+        <h2 style="font-size:18px;margin:0 0 16px">${icon} Nouvelle inscription ${typeLabel}</h2>
+        <div style="background:#231820;border-radius:12px;padding:16px;margin-bottom:20px">
+          <p style="color:#C9A96E;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px">Informations</p>
+          <p style="color:rgba(255,255,255,0.8);font-size:14px;margin:0;line-height:1.8">
+            <strong>Nom :</strong> ${name}<br>
+            <strong>Email :</strong> ${email}${extra ? `<br>${extra}` : ''}
+          </p>
+        </div>
+        <a href="${BASE_URL}/admin" style="display:inline-block;background:#C8547A;color:#fff;text-decoration:none;padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px">
+          Voir l'interface admin
+        </a>
+      </div>
+    `,
+  })
+}
+
 export async function sendWelcomeEmail(email: string, name: string, isFoundingMember: boolean) {
   await resend.emails.send({
     from: FROM,

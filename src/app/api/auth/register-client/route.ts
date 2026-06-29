@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { sendWelcomeClientEmail, sendAdminNewUserEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,6 +26,9 @@ export async function POST(req: NextRequest) {
         role: 'CLIENT',
       },
     })
+
+    sendWelcomeClientEmail(email, name).catch(() => {})
+    sendAdminNewUserEmail('client', name, email).catch(() => {})
 
     return NextResponse.json({ success: true })
   } catch (err) {
