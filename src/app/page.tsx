@@ -203,6 +203,41 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Inscription cliente */}
+      <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div className="bg-dark-card border border-dark-border rounded-3xl p-8 sm:p-12 flex flex-col md:flex-row items-center gap-10">
+          <div className="flex-1 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 bg-rose/10 text-rose text-sm font-medium px-4 py-2 rounded-full mb-5">
+              💜 Espace clients
+            </div>
+            <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-white mb-4">
+              Créez votre compte <span className="text-gradient-rose-gold">gratuitement</span>
+            </h2>
+            <p className="text-white/50 text-sm leading-relaxed max-w-md mb-8">
+              Sauvegardez vos prestataires favoris, publiez vos demandes et retrouvez tout votre historique en un clic.
+            </p>
+            <Link href="/inscription-client" className="btn-primary inline-flex items-center gap-2">
+              Créer mon compte <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 w-full md:w-auto md:min-w-[260px]">
+            {[
+              { icon: '❤️', title: 'Favoris', desc: 'Sauvegardez vos prestataires préférés' },
+              { icon: '📋', title: 'Demandes', desc: 'Publiez vos besoins, recevez des offres' },
+              { icon: '🔔', title: 'Alertes', desc: 'Soyez notifié des nouveaux prestataires' },
+            ].map(item => (
+              <div key={item.title} className="flex items-start gap-3 bg-dark-surface border border-dark-border rounded-xl p-4">
+                <span className="text-2xl">{item.icon}</span>
+                <div>
+                  <p className="text-white font-medium text-sm">{item.title}</p>
+                  <p className="text-white/40 text-xs mt-0.5">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Comment ça marche */}
       <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto">
         <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-white text-center mb-12">
