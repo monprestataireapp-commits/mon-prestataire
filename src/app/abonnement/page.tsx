@@ -175,8 +175,13 @@ function AbonnementContent() {
           })}
         </div>
 
+        {/* Mention légale */}
+        <p className="text-center text-white/20 text-xs mt-8 max-w-xl mx-auto leading-relaxed">
+          L&apos;abonnement MonPrestataire donne accès à une visibilité sur la plateforme et ne constitue pas une garantie de ventes ou de mise en relation.
+        </p>
+
         {/* FAQ rapide */}
-        <div className="mt-12 bg-dark-card border border-dark-border rounded-2xl p-6">
+        <div className="mt-8 bg-dark-card border border-dark-border rounded-2xl p-6">
           <h2 className="font-cormorant text-2xl font-semibold text-white mb-4">Questions fréquentes</h2>
           <div className="space-y-4">
             {[

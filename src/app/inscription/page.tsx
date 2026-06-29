@@ -368,6 +368,9 @@ export default function InscriptionPage() {
           Déjà inscrit ?{' '}
           <Link href="/connexion" className="text-rose hover:underline">Se connecter</Link>
         </p>
+        <p className="text-center text-white/20 text-xs mt-3 max-w-md mx-auto leading-relaxed">
+          L&apos;abonnement MonPrestataire donne accès à une visibilité sur la plateforme et ne constitue pas une garantie de ventes ou de mise en relation.
+        </p>
       </div>
     </div>
   )
