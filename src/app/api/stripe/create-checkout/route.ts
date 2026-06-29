@@ -39,12 +39,12 @@ export async function POST(req: NextRequest) {
     mode: 'subscription',
     payment_method_types: ['card'],
     line_items: [{ price: plan.priceId, quantity: 1 }],
-    discounts: isFoundingMember ? [{ coupon: 'LANCEMENT6MOIS' }] : [],
     success_url: `${process.env.NEXTAUTH_URL}/abonnement/succes`,
     cancel_url: `${process.env.NEXTAUTH_URL}/abonnement/annulation`,
     metadata: { providerId: provider.id, planKey, isFoundingMember: isFoundingMember ? 'true' : 'false' },
     subscription_data: {
       metadata: { providerId: provider.id, planKey },
+      ...(isFoundingMember ? { trial_period_days: 180 } : {}),
     },
   })
 
