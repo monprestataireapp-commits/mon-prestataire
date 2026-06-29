@@ -108,7 +108,7 @@ export function Navbar() {
                     S&apos;inscrire (prestataire)
                   </Link>
                   <Link href="/inscription-client" className="btn-secondary text-sm py-1.5 px-4 text-center">
-                    S&apos;inscrire (cliente)
+                    S&apos;inscrire (client)
                   </Link>
                 </div>
               </>
@@ -174,7 +174,7 @@ export function Navbar() {
                 S&apos;inscrire (prestataire)
               </Link>
               <Link href="/inscription-client" onClick={() => setMobileOpen(false)} className="btn-secondary text-sm py-2 px-4 text-center">
-                S&apos;inscrire (cliente)
+                S&apos;inscrire (client)
               </Link>
             </div>
           )}
