@@ -104,7 +104,7 @@ export function Navbar() {
                   Connexion
                 </Link>
                 <Link href="/inscription" className="btn-primary text-sm py-2 px-4">
-                  S&apos;inscrire
+                  S&apos;inscrire (prestataire)
                 </Link>
               </>
             )}
@@ -166,7 +166,7 @@ export function Navbar() {
                 Connexion
               </Link>
               <Link href="/inscription" onClick={() => setMobileOpen(false)} className="btn-primary text-sm py-2 px-4 flex-1 text-center">
-                S&apos;inscrire
+                S&apos;inscrire (prestataire)
               </Link>
             </div>
           )}
