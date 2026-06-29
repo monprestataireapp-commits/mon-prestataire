@@ -16,6 +16,9 @@ export function AdminPanel() {
   const [reviews, setReviews] = useState<any[]>([])
   const [newsletters, setNewsletters] = useState<string[]>([])
   const [foundingCount, setFoundingCount] = useState(0)
+  const [editingFoundingCount, setEditingFoundingCount] = useState(false)
+  const [foundingCountInput, setFoundingCountInput] = useState('')
+  const [foundingCountSaving, setFoundingCountSaving] = useState(false)
   const [globalStats, setGlobalStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'pending' | 'active' | 'premium'>('all')
@@ -113,6 +116,20 @@ export function AdminPanel() {
     setCreateLoading(false)
   }
 
+  async function saveFoundingCount() {
+    const val = parseInt(foundingCountInput)
+    if (isNaN(val) || val < 0 || val > 100) return
+    setFoundingCountSaving(true)
+    await fetch('/api/admin/founding-count', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ count: val }),
+    })
+    setFoundingCount(val)
+    setEditingFoundingCount(false)
+    setFoundingCountSaving(false)
+  }
+
   async function reviewAction(reviewId: string, action: string) {
     await fetch('/api/admin/reviews', {
       method: 'PATCH',
@@ -198,6 +215,35 @@ export function AdminPanel() {
             </div>
           </div>
           <span className="text-white/50 text-sm shrink-0">{100 - foundingCount} places restantes</span>
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          {editingFoundingCount ? (
+            <>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={foundingCountInput}
+                onChange={e => setFoundingCountInput(e.target.value)}
+                className="w-20 bg-dark border border-gold/40 rounded-lg px-2 py-1 text-white text-sm text-center"
+                placeholder={String(foundingCount)}
+              />
+              <span className="text-white/40 text-sm">places prises (sur 100)</span>
+              <button onClick={saveFoundingCount} disabled={foundingCountSaving}
+                className="ml-2 px-3 py-1 rounded-lg bg-gold text-dark text-xs font-semibold hover:bg-gold/80 transition-colors">
+                {foundingCountSaving ? '…' : 'Enregistrer'}
+              </button>
+              <button onClick={() => setEditingFoundingCount(false)}
+                className="px-3 py-1 rounded-lg bg-dark-card border border-dark-border text-white/40 text-xs hover:text-white transition-colors">
+                Annuler
+              </button>
+            </>
+          ) : (
+            <button onClick={() => { setFoundingCountInput(String(foundingCount)); setEditingFoundingCount(true) }}
+              className="text-gold/60 text-xs hover:text-gold transition-colors underline underline-offset-2">
+              Modifier le compteur
+            </button>
+          )}
         </div>
       </div>
 
