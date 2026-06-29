@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { CheckCircle, XCircle, Eye, EyeOff, Shield, Users, Zap, Star, MessageSquare, Mail, Download, BarChart2, TrendingUp, Trash2, ExternalLink } from 'lucide-react'
+import { CheckCircle, XCircle, Eye, EyeOff, Shield, Users, Zap, Star, MessageSquare, Mail, Download, BarChart2, TrendingUp, Trash2, ExternalLink, UserPlus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type Tab = 'stats' | 'providers' | 'reviews' | 'newsletter'
+
+const EMPTY_FORM = { name: '', email: '', password: '', businessName: '', city: '', region: '', months: '6' }
 
 export function AdminPanel() {
   const [tab, setTab] = useState<Tab>('stats')
@@ -17,6 +19,11 @@ export function AdminPanel() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'pending' | 'active' | 'premium'>('all')
   const [search, setSearch] = useState('')
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createForm, setCreateForm] = useState(EMPTY_FORM)
+  const [createLoading, setCreateLoading] = useState(false)
+  const [createError, setCreateError] = useState('')
+  const [createSuccess, setCreateSuccess] = useState('')
 
   useEffect(() => {
     loadData()
@@ -79,6 +86,30 @@ export function AdminPanel() {
     loadData()
   }
 
+  async function createFreeProvider() {
+    setCreateLoading(true)
+    setCreateError('')
+    setCreateSuccess('')
+    try {
+      const res = await fetch('/api/admin/create-provider-free', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...createForm, months: Number(createForm.months) }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setCreateError(data.error || 'Erreur serveur')
+      } else {
+        setCreateSuccess(`✅ Compte créé — ${createForm.months} mois gratuits pour ${createForm.businessName}`)
+        setCreateForm(EMPTY_FORM)
+        loadData()
+      }
+    } catch {
+      setCreateError('Erreur réseau')
+    }
+    setCreateLoading(false)
+  }
+
   async function reviewAction(reviewId: string, action: string) {
     await fetch('/api/admin/reviews', {
       method: 'PATCH',
@@ -113,14 +144,22 @@ export function AdminPanel() {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-rose/10 flex items-center justify-center">
-          <Shield size={20} className="text-rose" />
+      <div className="flex items-center justify-between gap-3 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-rose/10 flex items-center justify-center">
+            <Shield size={20} className="text-rose" />
+          </div>
+          <div>
+            <h1 className="font-cormorant text-3xl font-bold text-white">Administration</h1>
+            <p className="text-white/40 text-sm">MonPrestataire — Espace admin</p>
+          </div>
         </div>
-        <div>
-          <h1 className="font-cormorant text-3xl font-bold text-white">Administration</h1>
-          <p className="text-white/40 text-sm">MonPrestataire — Espace admin</p>
-        </div>
+        <button
+          onClick={() => { setShowCreateModal(true); setCreateError(''); setCreateSuccess('') }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose text-white text-sm font-medium hover:bg-rose/80 transition-colors shrink-0"
+        >
+          <UserPlus size={15} /> Créer un compte gratuit
+        </button>
       </div>
 
       {/* Stats */}
@@ -424,6 +463,123 @@ export function AdminPanel() {
               ))}
             </div>
           )}
+        </div>
+      )}
+      {/* Modal création compte gratuit */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-dark-card border border-dark-border rounded-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-cormorant text-2xl font-bold text-white">Créer un compte prestataire gratuit</h2>
+              <button onClick={() => setShowCreateModal(false)} className="text-white/40 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Prénom Nom *</label>
+                  <input
+                    value={createForm.name}
+                    onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
+                    className="input-dark text-sm"
+                    placeholder="Sophie Martin"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Email *</label>
+                  <input
+                    type="email"
+                    value={createForm.email}
+                    onChange={e => setCreateForm(f => ({ ...f, email: e.target.value }))}
+                    className="input-dark text-sm"
+                    placeholder="sophie@email.fr"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-white/40 mb-1 block">Mot de passe provisoire *</label>
+                <input
+                  value={createForm.password}
+                  onChange={e => setCreateForm(f => ({ ...f, password: e.target.value }))}
+                  className="input-dark text-sm"
+                  placeholder="Au moins 6 caractères"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-white/40 mb-1 block">Nom du business *</label>
+                <input
+                  value={createForm.businessName}
+                  onChange={e => setCreateForm(f => ({ ...f, businessName: e.target.value }))}
+                  className="input-dark text-sm"
+                  placeholder="Sophie Maquillage Paris"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Ville *</label>
+                  <input
+                    value={createForm.city}
+                    onChange={e => setCreateForm(f => ({ ...f, city: e.target.value }))}
+                    className="input-dark text-sm"
+                    placeholder="Paris"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Région *</label>
+                  <input
+                    value={createForm.region}
+                    onChange={e => setCreateForm(f => ({ ...f, region: e.target.value }))}
+                    className="input-dark text-sm"
+                    placeholder="Île-de-France"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-white/40 mb-1 block">Durée gratuite</label>
+                <div className="flex gap-2">
+                  {(['3', '6', '12'] as const).map(m => (
+                    <button
+                      key={m}
+                      onClick={() => setCreateForm(f => ({ ...f, months: m }))}
+                      className={cn(
+                        'flex-1 py-2 rounded-xl text-sm font-medium border transition-colors',
+                        createForm.months === m
+                          ? 'bg-rose border-rose text-white'
+                          : 'border-dark-border text-white/50 hover:border-rose/30'
+                      )}
+                    >
+                      {m} mois
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {createError && <p className="text-rose text-sm">{createError}</p>}
+              {createSuccess && <p className="text-green-400 text-sm">{createSuccess}</p>}
+            </div>
+
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="flex-1 py-2.5 rounded-xl border border-dark-border text-white/50 text-sm hover:border-rose/30 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={createFreeProvider}
+                disabled={createLoading}
+                className="flex-1 py-2.5 rounded-xl bg-rose text-white text-sm font-medium hover:bg-rose/80 transition-colors disabled:opacity-50"
+              >
+                {createLoading ? 'Création…' : `Créer — ${createForm.months} mois gratuits`}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
