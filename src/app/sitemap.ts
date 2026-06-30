@@ -58,7 +58,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter(s => s.city)
     .map(s => s.city!.toLowerCase().replace(/\s+/g, '-'))
 
-  const allCities = [...new Set([...TOP_CITIES, ...dbCities])]
+  const allCitiesSet = new Set([...TOP_CITIES, ...dbCities])
+  const allCities = Array.from(allCitiesSet)
 
   const catCityRoutes: MetadataRoute.Sitemap = []
   for (const cat of CATEGORIES) {
