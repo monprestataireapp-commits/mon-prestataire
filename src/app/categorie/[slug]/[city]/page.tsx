@@ -43,7 +43,7 @@ export default async function CategoryCityPage({ params }: Props) {
   const providers = await prisma.provider.findMany({
     where: {
       isPublished: true,
-      subscriptionStatus: 'active',
+      subscriptionStatus: { in: ['active', 'trialing'] },
       categories: { some: { category: { slug: params.slug } } },
       city: { contains: city },
     },

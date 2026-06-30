@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://mon-prestataire.fr'
 
   const providers = await prisma.provider.findMany({
-    where: { isPublished: true, subscriptionStatus: 'active' },
+    where: { isPublished: true, subscriptionStatus: { in: ['active', 'trialing'] } },
     select: { slug: true, updatedAt: true },
   })
 
@@ -40,25 +40,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Pages catégorie × ville pour les villes avec au moins 1 prestataire
+  // Pages catégorie × ville : villes avec prestataires + grandes villes FR
+  const TOP_CITIES = [
+    'paris', 'lyon', 'marseille', 'toulouse', 'bordeaux', 'lille', 'nantes', 'strasbourg',
+    'nice', 'montpellier', 'rennes', 'grenoble', 'rouen', 'toulon', 'saint-etienne', 'dijon',
+    'angers', 'reims', 'brest', 'le-havre', 'clermont-ferrand', 'metz', 'nancy', 'perpignan',
+    'orleans', 'caen', 'avignon', 'aix-en-provence', 'limoges', 'amiens', 'tours', 'metz',
+  ]
+
   const cityStats = await prisma.provider.groupBy({
     by: ['city'],
-    where: { isPublished: true, subscriptionStatus: 'active' },
+    where: { isPublished: true, subscriptionStatus: { in: ['active', 'trialing'] } },
     _count: { city: true },
   })
 
+  const dbCities = cityStats
+    .filter(s => s.city)
+    .map(s => s.city!.toLowerCase().replace(/\s+/g, '-'))
+
+  const allCities = [...new Set([...TOP_CITIES, ...dbCities])]
+
   const catCityRoutes: MetadataRoute.Sitemap = []
   for (const cat of CATEGORIES) {
-    for (const stat of cityStats) {
-      if (stat._count.city >= 1 && stat.city) {
-        const citySlug = stat.city.toLowerCase().replace(/\s+/g, '-')
-        catCityRoutes.push({
-          url: `${baseUrl}/categorie/${cat.slug}/${encodeURIComponent(citySlug)}`,
-          lastModified: new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.6,
-        })
-      }
+    for (const citySlug of allCities) {
+      catCityRoutes.push({
+        url: `${baseUrl}/categorie/${cat.slug}/${encodeURIComponent(citySlug)}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: TOP_CITIES.includes(citySlug) ? 0.7 : 0.6,
+      })
     }
   }
 
