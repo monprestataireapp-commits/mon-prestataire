@@ -8,6 +8,7 @@ import { ReviewForm } from '@/components/provider/ReviewForm'
 import { PhotoLightbox } from '@/components/provider/PhotoLightbox'
 import { ShareButton } from '@/components/provider/ShareButton'
 import { ViewTracker } from '@/components/provider/ViewTracker'
+import { getPhotoUrl } from '@/lib/photo'
 import { ReportButton } from '@/components/provider/ReportButton'
 import { DevisButton } from '@/components/provider/DevisButton'
 
@@ -116,7 +117,7 @@ export default async function ProviderPage({ params }: Props) {
         {/* Cover */}
         <div className="relative h-48 sm:h-64">
           <Image
-            src={provider.coverPhoto || provider.photos[0]?.url || provider.profilePhoto || 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&q=80'}
+            src={getPhotoUrl(provider.coverPhoto || provider.photos[0]?.url || provider.profilePhoto, 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&q=80')}
             alt={provider.businessName}
             fill
             className="object-cover"
@@ -129,7 +130,7 @@ export default async function ProviderPage({ params }: Props) {
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12 relative">
             <div className="w-24 h-24 rounded-2xl border-4 border-dark-card overflow-hidden shrink-0 bg-dark">
               {provider.profilePhoto ? (
-                <Image src={provider.profilePhoto} alt={provider.businessName} width={96} height={96} className="object-cover w-full h-full" />
+                <Image src={getPhotoUrl(provider.profilePhoto)} alt={provider.businessName} width={96} height={96} className="object-cover w-full h-full" />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-rose to-gold flex items-center justify-center text-3xl text-white font-bold font-cormorant">
                   {provider.businessName[0]}

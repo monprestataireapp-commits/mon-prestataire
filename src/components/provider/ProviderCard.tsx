@@ -6,6 +6,7 @@ import { Star, MapPin, Heart, CheckCircle, Truck } from 'lucide-react'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
+import { getPhotoUrl } from '@/lib/photo'
 
 interface ProviderCardProps {
   provider: {
@@ -37,7 +38,7 @@ export function ProviderCard({ provider, isFavorited = false }: ProviderCardProp
   const [loading, setLoading] = useState(false)
 
   const isPremium = provider.subscriptionPlan === 'premium'
-  const photo = provider.profilePhoto || provider.photos?.[0]?.url || '/placeholder-provider.svg'
+  const photo = getPhotoUrl(provider.profilePhoto || provider.photos?.[0]?.url)
 
   async function toggleFavorite(e: React.MouseEvent) {
     e.preventDefault()

@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const ext = (file.name || 'photo.jpg').split('.').pop() || 'jpg'
     const filename = `${type === 'cover' ? 'covers' : 'profiles'}/${provider.id}_${Date.now()}.${ext}`
-    const blob = await put(filename, file, { access: 'public', addRandomSuffix: true })
+    const blob = await put(filename, file, { access: 'private', addRandomSuffix: true })
 
     await prisma.provider.update({
       where: { id: provider.id },
