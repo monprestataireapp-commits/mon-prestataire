@@ -5,6 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { Analytics } from '@vercel/analytics/react'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: {
@@ -46,6 +47,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MobileNav />
         </Providers>
         <Analytics />
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-NWD05BHL7J" strategy="afterInteractive" />
+        <Script id="ga4" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-NWD05BHL7J');
+        `}</Script>
       </body>
     </html>
   )
