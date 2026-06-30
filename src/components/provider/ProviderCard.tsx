@@ -37,7 +37,7 @@ export function ProviderCard({ provider, isFavorited = false }: ProviderCardProp
   const [loading, setLoading] = useState(false)
 
   const isPremium = provider.subscriptionPlan === 'premium'
-  const photo = provider.profilePhoto || provider.photos?.[0]?.url || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80'
+  const photo = provider.profilePhoto || provider.photos?.[0]?.url || '/placeholder-provider.svg'
 
   async function toggleFavorite(e: React.MouseEvent) {
     e.preventDefault()
