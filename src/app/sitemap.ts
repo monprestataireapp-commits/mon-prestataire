@@ -46,6 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'nice', 'montpellier', 'rennes', 'grenoble', 'rouen', 'toulon', 'saint-etienne', 'dijon',
     'angers', 'reims', 'brest', 'le-havre', 'clermont-ferrand', 'metz', 'nancy', 'perpignan',
     'orleans', 'caen', 'avignon', 'aix-en-provence', 'limoges', 'amiens', 'tours', 'metz',
+    'saint-denis', 'saint-paul', 'le-tampon', 'saint-pierre', 'saint-andre', 'saint-louis',
   ]
 
   const cityStats = await prisma.provider.groupBy({
