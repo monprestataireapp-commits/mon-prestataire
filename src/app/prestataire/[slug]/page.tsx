@@ -49,7 +49,6 @@ async function getProvider(slug: string) {
       videos: true,
       reviews: {
         where: { isApproved: true },
-        include: { user: { select: { name: true } } },
         orderBy: { createdAt: 'desc' },
         take: 20,
         select: {
