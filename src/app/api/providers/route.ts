@@ -19,7 +19,10 @@ export async function GET(req: NextRequest) {
 
   const where: any = {
     isPublished: true,
-    subscriptionStatus: 'active',
+    OR: [
+      { subscriptionStatus: 'active' },
+      { subscriptionStatus: 'trialing' },
+    ],
   }
 
   if (q) {
