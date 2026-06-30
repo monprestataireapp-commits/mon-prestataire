@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
       await del(oldUrl).catch(() => {})
     }
 
-    const ext = file.name.split('.').pop() || 'jpg'
+    const ext = (file.name || 'photo.jpg').split('.').pop() || 'jpg'
     const filename = `${type === 'cover' ? 'covers' : 'profiles'}/${provider.id}_${Date.now()}.${ext}`
-    const blob = await put(filename, file, { access: 'public' })
+    const blob = await put(filename, file, { access: 'public', addRandomSuffix: true })
 
     await prisma.provider.update({
       where: { id: provider.id },
@@ -44,7 +44,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: blob.url })
   } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: 'Erreur upload' }, { status: 500 })
+    console.error('Erreur upload photo profil/couverture:', err)
+    const message = err instanceof Error ? err.message : 'Erreur upload'
+    return NextResponse.json({ error: `Erreur upload : ${message}` }, { status: 500 })
   }
 }
