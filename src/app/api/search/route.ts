@@ -53,10 +53,7 @@ export async function GET(req: NextRequest) {
 
   const where: any = {
     isPublished: true,
-    OR: [
-      { subscriptionStatus: 'active' },
-      { subscriptionStatus: 'trialing' },
-    ],
+    subscriptionStatus: { in: ['active', 'trialing'] },
   }
 
   if (intent.city) where.city = { contains: intent.city, mode: 'insensitive' }
