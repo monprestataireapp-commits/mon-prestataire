@@ -4,13 +4,13 @@ import { ProviderCard } from '@/components/provider/ProviderCard'
 import { CATEGORIES } from '@/lib/categories'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Star, Users, Shield, Zap } from 'lucide-react'
+import { ArrowRight, Star, Users, Shield, Zap, Check } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
 async function getFeaturedProviders() {
   const providers = await prisma.provider.findMany({
-    where: { isPublished: true, subscriptionStatus: 'active' },
+    where: { isPublished: true, subscriptionStatus: { in: ['active', 'trialing'] } },
     include: {
       categories: { include: { category: true } },
       photos: { take: 1, orderBy: { sortOrder: 'asc' } },
@@ -114,6 +114,85 @@ export default async function HomePage() {
                 <p className="text-white/40 text-xs mt-1">{stat.label}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Offre double — clientes & prestataires */}
+      <section className="py-12 px-4 sm:px-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Clientes */}
+          <div className="relative bg-dark-card border border-rose/20 rounded-3xl p-7 flex flex-col gap-5 overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-rose/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            <div className="inline-flex items-center gap-2 bg-rose/10 text-rose text-xs font-semibold px-3 py-1.5 rounded-full w-fit">
+              💜 Espace clientes
+            </div>
+            <div>
+              <p className="font-cormorant text-3xl font-bold text-white leading-tight">
+                Inscription <span className="text-gradient-rose-gold">100% gratuite</span>
+              </p>
+              <p className="text-white/50 text-sm mt-2 leading-relaxed">
+                Trouvez, comparez et contactez les meilleurs prestataires indépendants près de chez vous.
+              </p>
+            </div>
+            <ul className="space-y-2">
+              {['Recherche illimitée', 'Sauvegardez vos favoris', 'Publiez vos demandes', 'Accès aux avis vérifiés'].map(item => (
+                <li key={item} className="flex items-center gap-2 text-sm text-white/70">
+                  <Check size={14} className="text-rose shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link href="/inscription-client" className="btn-primary inline-flex items-center gap-2 w-fit mt-auto">
+              Créer mon compte gratuit <ArrowRight size={15} />
+            </Link>
+          </div>
+
+          {/* Prestataires */}
+          <div className="relative bg-dark-card border border-gold/20 rounded-3xl p-7 flex flex-col gap-5 overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-semibold px-3 py-1.5 rounded-full w-fit">
+              <Zap size={12} /> Offre lancement
+            </div>
+            <div>
+              <p className="font-cormorant text-3xl font-bold text-white leading-tight">
+                {remaining > 0 ? (
+                  <>6 mois <span className="text-gradient-rose-gold">offerts</span></>
+                ) : (
+                  <>Seulement <span className="text-gradient-rose-gold">4,99€/mois</span></>
+                )}
+              </p>
+              <p className="text-white/50 text-sm mt-2 leading-relaxed">
+                {remaining > 0
+                  ? `Les 100 premières prestataires bénéficient de 6 mois gratuits. Plus que ${remaining} places !`
+                  : 'Publiez votre profil et soyez visible par des milliers de clientes.'}
+              </p>
+            </div>
+            {remaining > 0 && (
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs text-white/40">
+                  <span>{foundingCount}/100 places prises</span>
+                  <span className="text-gold font-medium">Puis 4,99€/mois</span>
+                </div>
+                <div className="h-2 bg-dark rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-rose to-gold rounded-full transition-all"
+                    style={{ width: `${Math.max(5, (foundingCount / 100) * 100)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+            <ul className="space-y-2">
+              {['Profil complet avec photos & vidéos', 'Visibilité sur toutes les recherches', 'Avis clients vérifiés', 'Sans engagement'].map(item => (
+                <li key={item} className="flex items-center gap-2 text-sm text-white/70">
+                  <Check size={14} className="text-gold shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link href="/inscription" className="btn-gold inline-flex items-center gap-2 w-fit mt-auto">
+              {remaining > 0 ? 'Profiter de l\'offre' : 'Rejoindre MonPrestataire'} <ArrowRight size={15} />
+            </Link>
           </div>
         </div>
       </section>
