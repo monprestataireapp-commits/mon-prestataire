@@ -64,16 +64,22 @@ export default async function HomePage() {
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          {/* Badge offre lancement */}
-          {remaining > 0 && (
-            <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-2 mb-6 text-sm">
-              <Zap size={14} className="text-gold" />
-              <span className="text-gold font-medium">Offre lancement :</span>
-              <span className="text-white/70">6 mois gratuits — encore</span>
-              <span className="bg-gold text-white font-bold rounded-full px-2 py-0.5 text-xs">{remaining}</span>
-              <span className="text-white/70">places</span>
+          {/* Badges hero */}
+          <div className="flex flex-wrap justify-center gap-3 mb-6">
+            <div className="inline-flex items-center gap-2 bg-rose/10 border border-rose/30 rounded-full px-4 py-2 text-sm">
+              <span className="text-rose font-medium">💜 Clientes :</span>
+              <span className="text-white/70">inscription 100% gratuite</span>
             </div>
-          )}
+            {remaining > 0 && (
+              <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-2 text-sm">
+                <Zap size={14} className="text-gold" />
+                <span className="text-gold font-medium">Prestataires :</span>
+                <span className="text-white/70">6 mois gratuits — encore</span>
+                <span className="bg-gold text-white font-bold rounded-full px-2 py-0.5 text-xs">{remaining}</span>
+                <span className="text-white/70">places</span>
+              </div>
+            )}
+          </div>
 
           <h1 className="font-cormorant text-5xl sm:text-6xl md:text-7xl font-bold leading-tight mb-4">
             <span className="text-white">Le premier moteur</span>
