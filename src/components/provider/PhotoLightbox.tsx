@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { getPhotoUrl } from '@/lib/photo'
 
 interface Photo {
   id: string
@@ -34,7 +35,7 @@ export function PhotoLightbox({ photos, businessName }: Props) {
         {photos.map((photo, i) => (
           <button key={photo.id} onClick={() => { setIndex(i); setOpen(true) }}
             className="relative aspect-square rounded-xl overflow-hidden group focus:outline-none focus:ring-2 focus:ring-rose">
-            <Image src={photo.url} alt={photo.caption || businessName} fill
+            <Image src={getPhotoUrl(photo.url)} alt={photo.caption || businessName} fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 640px) 50vw, 33vw" />
             <div className="absolute inset-0 bg-dark/0 group-hover:bg-dark/20 transition-colors" />
@@ -49,7 +50,7 @@ export function PhotoLightbox({ photos, businessName }: Props) {
           <div className="relative w-full h-full flex items-center justify-center p-4 sm:p-12"
             onClick={e => e.stopPropagation()}>
             <div className="relative max-w-4xl max-h-full w-full h-full">
-              <Image src={photos[index].url} alt={photos[index].caption || businessName}
+              <Image src={getPhotoUrl(photos[index].url)} alt={photos[index].caption || businessName}
                 fill className="object-contain" sizes="100vw" />
             </div>
 

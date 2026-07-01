@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   const ext = file.name.split('.').pop() || 'mp4'
   const filename = `videos/${provider.id}-${Date.now()}.${ext}`
-  const blob = await put(filename, file, { access: 'public' })
+  const blob = await put(filename, file, { access: 'private', addRandomSuffix: true })
 
   const video = await prisma.providerVideo.create({
     data: { providerId: provider.id, url: blob.url, caption },

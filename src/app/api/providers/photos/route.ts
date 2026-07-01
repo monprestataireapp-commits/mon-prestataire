@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     const ext = file.name.split('.').pop() || 'jpg'
     const filename = `photos/${provider.id}_${Date.now()}.${ext}`
-    const blob = await put(filename, file, { access: 'public' })
+    const blob = await put(filename, file, { access: 'private', addRandomSuffix: true })
 
     const maxSortOrder = await prisma.providerPhoto.findFirst({
       where: { providerId: provider.id },

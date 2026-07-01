@@ -257,7 +257,7 @@ export default async function ProviderPage({ params }: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {provider.videos.map(v => (
                   <div key={v.id} className="rounded-xl overflow-hidden bg-dark border border-dark-border">
-                    <video src={v.url} controls className="w-full aspect-video object-cover" preload="metadata" />
+                    <video src={getPhotoUrl(v.url)} controls className="w-full aspect-video object-cover" preload="metadata" />
                     {v.caption && <p className="text-white/50 text-xs px-3 py-2">{v.caption}</p>}
                   </div>
                 ))}
