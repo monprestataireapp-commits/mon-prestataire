@@ -262,13 +262,13 @@ export default async function HomePage() {
           <div className="border-gradient rounded-3xl p-8 sm:p-12 text-center">
             <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-sm font-medium px-4 py-2 rounded-full mb-6">
               <Zap size={14} />
-              Offre lancement exclusive
+              Offre lancement — Prestataires
             </div>
             <h2 className="font-cormorant text-4xl sm:text-5xl font-bold text-white mb-4">
               6 mois <span className="text-gradient-rose-gold">offerts</span>
             </h2>
-            <p className="text-white/60 text-lg mb-4">
-              Les {remaining > 0 ? remaining : 'dernières'} premières places bénéficient de 6 mois gratuits avant activation de votre formule.
+            <p className="text-white/60 text-lg mb-2">
+              Les 100 premières prestataires inscrites bénéficient de <strong className="text-white">6 mois gratuits</strong>, puis seulement <strong className="text-gold">4,99€/mois</strong>.
             </p>
             {remaining > 0 && (
               <div className="flex items-center justify-center gap-3 mb-8">
