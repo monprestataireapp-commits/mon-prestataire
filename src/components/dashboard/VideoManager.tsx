@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Video, Plus, Trash2, Upload, Lock } from 'lucide-react'
+import { getPhotoUrl } from '@/lib/photo'
 import { toast } from '@/components/ui/Toast'
 
 interface ProviderVideo { id: string; url: string; caption?: string | null }
@@ -75,7 +76,7 @@ export function VideoManager({ initialVideos, isPremium }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
           {videos.map(v => (
             <div key={v.id} className="relative bg-dark rounded-xl overflow-hidden border border-dark-border group">
-              <video src={v.url} controls className="w-full aspect-video object-cover" preload="metadata" />
+              <video src={getPhotoUrl(v.url)} controls className="w-full aspect-video object-cover" preload="metadata" />
               {v.caption && (
                 <p className="text-white/50 text-xs px-3 py-2">{v.caption}</p>
               )}

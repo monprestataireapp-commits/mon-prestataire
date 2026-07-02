@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Plus, Trash2, Upload, Loader2, Crown, GripVertical } from 'lucide-react'
+import { getPhotoUrl } from '@/lib/photo'
 import { cn } from '@/lib/utils'
 import { toast } from '@/components/ui/Toast'
 
@@ -118,7 +119,7 @@ export function PhotoManager({ initialPhotos, maxPhotos, isPremium }: Props) {
             onDrop={onDrop}
             className="relative aspect-square rounded-xl overflow-hidden group bg-dark cursor-grab active:cursor-grabbing"
           >
-            <Image src={photo.url} alt={photo.caption || 'Photo'} fill className="object-cover" sizes="150px" />
+            <Image src={getPhotoUrl(photo.url)} alt={photo.caption || 'Photo'} fill className="object-cover" sizes="150px" />
             {/* Overlay au survol */}
             <div className="absolute inset-0 bg-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <button onClick={() => deletePhoto(photo.id)}
