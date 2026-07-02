@@ -110,7 +110,7 @@ export default async function ProviderPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ViewTracker slug={provider.slug} />
+      <ViewTracker slug={provider.slug} isOwner={isOwner} />
 
       {/* Bannière prévisualisation (visible uniquement par la propriétaire) */}
       {isOwner && !provider.isPublished && (
