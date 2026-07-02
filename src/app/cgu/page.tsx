@@ -18,10 +18,10 @@ export default function CGUPage() {
         <section>
           <h2 className="font-cormorant text-2xl text-white font-semibold mb-3">2. Abonnements prestataires</h2>
           <h3 className="text-white font-medium mb-2">Formule Standard — 4,99€/mois ou 49,90€/an</h3>
-          <p>L&apos;abonnement mensuel implique un <strong className="text-white">engagement ferme de 12 mois</strong>. La résiliation est possible après cette période avec un préavis de 30 jours. Aucun remboursement des mois déjà payés ne sera effectué.</p>
+          <p>L&apos;abonnement mensuel est <strong className="text-white">sans engagement</strong>. La résiliation est possible à tout moment depuis le tableau de bord, sans préavis. Aucun remboursement des mois déjà payés ne sera effectué.</p>
           <p className="mt-2">L&apos;abonnement annuel est <strong className="text-white">non remboursable</strong> et non résiliable en cours d&apos;année.</p>
           <h3 className="text-white font-medium mt-4 mb-2">Formule Premium — 9,99€/mois ou 99,90€/an</h3>
-          <p>Les mêmes conditions d&apos;engagement s&apos;appliquent à la formule Premium.</p>
+          <p>Les mêmes conditions s&apos;appliquent à la formule Premium.</p>
         </section>
 
         <section>

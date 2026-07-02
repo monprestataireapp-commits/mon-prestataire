@@ -23,7 +23,7 @@ const PLANS = {
       'Numéro de téléphone visible',
       'Informations de livraison',
     ],
-    note: 'Engagement 12 mois pour le mensuel · Résiliation après 12 mois avec préavis 30 jours',
+    note: 'Sans engagement · Résiliable à tout moment',
   },
   premium: {
     name: 'Premium',
@@ -40,7 +40,7 @@ const PLANS = {
       'Statistiques avancées du tableau de bord',
       'Mis en avant sur la page d\'accueil',
     ],
-    note: 'Mêmes conditions d\'engagement que Standard',
+    note: 'Sans engagement · Résiliable à tout moment',
     recommended: true,
   },
 }
@@ -185,7 +185,7 @@ function AbonnementContent() {
           <h2 className="font-cormorant text-2xl font-semibold text-white mb-4">Questions fréquentes</h2>
           <div className="space-y-4">
             {[
-              { q: 'Puis-je résilier à tout moment ?', a: 'Pour l\'abonnement mensuel, la résiliation est possible après 12 mois avec un préavis de 30 jours. L\'abonnement annuel n\'est pas remboursable.' },
+              { q: 'Puis-je résilier à tout moment ?', a: 'Oui, vous pouvez résilier à tout moment depuis votre tableau de bord, sans engagement ni préavis. L\'abonnement annuel n\'est pas remboursable.' },
               { q: 'Comment fonctionne l\'offre lancement ?', a: 'Les 100 premiers prestataires bénéficient de 6 mois gratuits avant l\'activation de leur abonnement choisi. Le coupon est appliqué automatiquement lors du paiement.' },
               { q: 'Mon profil est-il visible immédiatement ?', a: 'Votre profil est soumis à validation par l\'équipe MonPrestataire avant publication. Ce processus dure généralement moins de 24h.' },
               { q: 'Puis-je changer de formule ?', a: 'Oui, vous pouvez passer de Standard à Premium à tout moment depuis votre tableau de bord.' },

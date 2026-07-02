@@ -97,7 +97,7 @@ export default function CommentCaMarchePage() {
               { q: 'Quelle est la différence entre Standard et Premium ?', a: 'Standard (4,99€/mois) : profil complet, 20 photos, téléphone visible. Premium (9,99€/mois) : tout Standard + 50 photos, statistiques avancées, mise en avant prioritaire.' },
               { q: 'Puis-je tester sans engagement ?', a: 'Les 100 premiers prestataires bénéficient de 6 mois gratuits avec le coupon LANCEMENT6MOIS, appliqué automatiquement à l\'inscription.' },
               { q: 'Comment obtenir le badge Vérifié ?', a: 'Contactez notre équipe avec vos justificatifs d\'activité (KBIS, attestation SIRET, ou tout document prouvant votre activité). La vérification est manuelle.' },
-              { q: 'L\'abonnement est-il sans engagement ?', a: 'La formule mensuelle nécessite un engagement minimum de 12 mois (conformément aux CGU). La formule annuelle est payée en une fois, non remboursable.' },
+              { q: 'L\'abonnement est-il sans engagement ?', a: 'Oui, les formules mensuelle et annuelle sont sans engagement. Vous pouvez résilier à tout moment depuis votre tableau de bord.' },
             ].map(faq => (
               <div key={faq.q} className="border-b border-dark-border pb-5 last:border-0 last:pb-0">
                 <p className="text-white font-medium mb-1.5">{faq.q}</p>

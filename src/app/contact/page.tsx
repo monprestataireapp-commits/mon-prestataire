@@ -152,7 +152,7 @@ export default function ContactPage() {
             <div className="space-y-4">
               {[
                 { q: 'Comment référencer mon activité ?', a: 'Cliquez sur "Devenir prestataire" et suivez les 5 étapes d\'inscription. Votre profil est actif dès la souscription d\'un abonnement.' },
-                { q: 'Puis-je annuler mon abonnement ?', a: 'Oui, depuis votre tableau de bord → "Mon abonnement". L\'engagement minimum est de 12 mois pour la formule mensuelle.' },
+                { q: 'Puis-je annuler mon abonnement ?', a: 'Oui, depuis votre tableau de bord → "Mon abonnement". Résiliation possible à tout moment, sans engagement.' },
                 { q: 'Comment signaler un prestataire ?', a: 'Utilisez le formulaire ci-contre avec le sujet "Signaler un prestataire" ou écrivez à contact@mon-prestataire.fr.' },
               ].map(faq => (
                 <div key={faq.q} className="border-b border-dark-border pb-4 last:border-0 last:pb-0">
