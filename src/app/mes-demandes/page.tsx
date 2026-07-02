@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { getPhotoUrl } from '@/lib/photo'
 import Image from 'next/image'
 import { MapPin, Calendar, Euro, MessageSquare, Plus } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
@@ -96,7 +97,7 @@ export default async function MesDemandesPage() {
                         <Link href={`/prestataire/${resp.provider.slug}`} className="shrink-0">
                           <div className="w-10 h-10 rounded-xl overflow-hidden bg-dark border border-dark-border">
                             {resp.provider.profilePhoto ? (
-                              <Image src={resp.provider.profilePhoto} alt={resp.provider.businessName} width={40} height={40} className="w-full h-full object-cover" />
+                              <Image src={getPhotoUrl(resp.provider.profilePhoto)} alt={resp.provider.businessName} width={40} height={40} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-br from-rose to-gold flex items-center justify-center text-white text-sm font-bold">
                                 {resp.provider.businessName[0]}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { CheckCircle, XCircle, Eye, EyeOff, Shield, Users, Zap, Star, MessageSquare, Mail, Download, BarChart2, TrendingUp, Trash2, ExternalLink, UserPlus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getPhotoUrl } from '@/lib/photo'
 
 type Tab = 'stats' | 'providers' | 'clients' | 'reviews' | 'newsletter'
 
@@ -378,7 +379,7 @@ export function AdminPanel() {
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-10 h-10 rounded-xl overflow-hidden bg-dark shrink-0">
                       {p.profilePhoto ? (
-                        <Image src={p.profilePhoto} alt={p.businessName} width={40} height={40} className="object-cover" />
+                        <Image src={getPhotoUrl(p.profilePhoto)} alt={p.businessName} width={40} height={40} className="object-cover" />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-rose to-gold flex items-center justify-center text-white font-bold text-sm">
                           {p.businessName?.[0]}
