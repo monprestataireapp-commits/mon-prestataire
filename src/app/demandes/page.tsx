@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { MapPin, Calendar, Euro, MessageSquare, Plus, X, Send, ChevronDown, ChevronUp } from 'lucide-react'
+import { MapPin, Calendar, Euro, MessageSquare, Plus, X, Send, ChevronDown, ChevronUp, CheckCircle, Trash2, Archive } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CATEGORIES } from '@/lib/categories'
@@ -27,7 +27,9 @@ function DemandesContent() {
   const [expandedResponses, setExpandedResponses] = useState<Set<string>>(new Set())
 
   const isProvider = (session?.user as any)?.role === 'PROVIDER'
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
   const isLoggedIn = !!session?.user
+  const currentUserId = (session?.user as any)?.id
 
   const [form, setForm] = useState({
     title: '', description: '', categoryId: '', city: '', region: '', budget: '', eventDate: '',
@@ -89,6 +91,23 @@ function DemandesContent() {
     setResponseMsg('')
     setResponsePrice('')
     loadRequests()
+  }
+
+  async function archiveRequest(id: string) {
+    await fetch(`/api/requests/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'archive' }),
+    })
+    setRequests(prev => prev.filter(r => r.id !== id))
+    setTotal(t => t - 1)
+  }
+
+  async function deleteRequest(id: string) {
+    if (!confirm('Supprimer définitivement cette demande ?')) return
+    await fetch(`/api/requests/${id}`, { method: 'DELETE' })
+    setRequests(prev => prev.filter(r => r.id !== id))
+    setTotal(t => t - 1)
   }
 
   function toggleResponses(id: string) {
@@ -300,6 +319,35 @@ function DemandesContent() {
                         className="btn-secondary text-sm py-1.5 px-4 inline-flex items-center gap-1">
                         <MessageSquare size={13} /> Répondre (connexion requise)
                       </Link>
+                    </div>
+                  )}
+
+                  {/* Bannière "Avez-vous trouvé ?" pour le propriétaire */}
+                  {currentUserId && req.userId === currentUserId && (
+                    <div className="mt-4 flex items-center justify-between gap-3 bg-green-500/5 border border-green-500/15 rounded-xl p-3">
+                      <div className="flex items-center gap-2 text-sm text-white/50">
+                        <CheckCircle size={15} className="text-green-400/60" />
+                        Avez-vous trouvé votre prestataire ?
+                      </div>
+                      <button onClick={() => archiveRequest(req.id)}
+                        className="flex items-center gap-1.5 text-xs bg-green-500/10 border border-green-500/20 text-green-400 px-3 py-1.5 rounded-lg hover:bg-green-500/20 transition-colors">
+                        <CheckCircle size={12} /> Oui, archiver
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Actions admin */}
+                  {isAdmin && (
+                    <div className="mt-3 flex items-center gap-2 pt-3 border-t border-dark-border">
+                      <span className="text-xs text-white/20 mr-auto">Admin</span>
+                      <button onClick={() => archiveRequest(req.id)}
+                        className="flex items-center gap-1 text-xs text-white/40 hover:text-gold transition-colors px-2 py-1">
+                        <Archive size={12} /> Archiver
+                      </button>
+                      <button onClick={() => deleteRequest(req.id)}
+                        className="flex items-center gap-1 text-xs text-white/40 hover:text-rose transition-colors px-2 py-1">
+                        <Trash2 size={12} /> Supprimer
+                      </button>
                     </div>
                   )}
                 </div>

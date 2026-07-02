@@ -67,3 +67,38 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   return NextResponse.json({ response })
 }
+
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+
+  const userId = (session.user as any).id
+  const role = (session.user as any).role
+  const { action } = await req.json()
+
+  const clientRequest = await prisma.clientRequest.findUnique({ where: { id: params.id } })
+  if (!clientRequest) return NextResponse.json({ error: 'Demande introuvable' }, { status: 404 })
+
+  const isOwner = clientRequest.userId === userId
+  const isAdmin = role === 'ADMIN'
+
+  if (!isOwner && !isAdmin) return NextResponse.json({ error: 'Non autorisé' }, { status: 403 })
+
+  if (action === 'archive') {
+    await prisma.clientRequest.update({ where: { id: params.id }, data: { isPublished: false } })
+    return NextResponse.json({ success: true })
+  }
+
+  return NextResponse.json({ error: 'Action inconnue' }, { status: 400 })
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+
+  const role = (session.user as any).role
+  if (role !== 'ADMIN') return NextResponse.json({ error: 'Réservé aux admins' }, { status: 403 })
+
+  await prisma.clientRequest.delete({ where: { id: params.id } })
+  return NextResponse.json({ success: true })
+}
