@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   const provider = await prisma.provider.findUnique({ where: { userId } })
   if (!provider) return NextResponse.json({ error: 'Profil introuvable' }, { status: 404 })
 
-  const maxPhotos = provider.subscriptionPlan === 'premium' ? 50 : 20
+  const maxPhotos = provider.subscriptionPlan === 'premium' ? 9999 : 3
   const currentCount = await prisma.providerPhoto.count({ where: { providerId: provider.id } })
   if (currentCount >= maxPhotos) {
     return NextResponse.json({ error: `Limite de ${maxPhotos} photos atteinte pour votre formule` }, { status: 400 })

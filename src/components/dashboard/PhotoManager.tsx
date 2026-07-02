@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { Plus, Trash2, Upload, Loader2, Crown, GripVertical } from 'lucide-react'
+import { Plus, Trash2, Upload, Loader2, Crown, GripVertical, ShoppingCart } from 'lucide-react'
 import { getPhotoUrl } from '@/lib/photo'
 import { cn } from '@/lib/utils'
 import { toast } from '@/components/ui/Toast'
@@ -165,10 +165,24 @@ export function PhotoManager({ initialPhotos, maxPhotos, isPremium }: Props) {
         </button>
       )}
 
-      {!isPremium && photos.length >= 15 && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-gold/70">
-          <Crown size={13} className="text-gold" />
-          Passez en Premium pour jusqu&apos;à 50 photos
+      {!isPremium && remaining === 0 && (
+        <div className="mt-4 bg-dark border border-dark-border rounded-xl p-4 space-y-3">
+          <p className="text-white/60 text-sm font-medium">Vous avez atteint la limite de 3 photos (offre Standard)</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href="/abonnement"
+              className="flex items-center gap-2 bg-gold/10 border border-gold/30 text-gold text-sm px-4 py-2.5 rounded-xl hover:bg-gold/20 transition-colors"
+            >
+              <Crown size={14} /> Passer en Premium — photos illimitées
+            </a>
+            <a
+              href="mailto:contact@mon-prestataire.fr?subject=Ajout%20photos%20supplémentaires&body=Bonjour%2C%20je%20souhaite%20ajouter%20des%20photos%20supplémentaires%20à%20mon%20profil%20(0%2C50%20€%2Fphoto)."
+              className="flex items-center gap-2 bg-dark-card border border-dark-border text-white/60 text-sm px-4 py-2.5 rounded-xl hover:border-rose/30 hover:text-white transition-colors"
+            >
+              <ShoppingCart size={14} /> Ajouter des photos — 0,50€/photo
+            </a>
+          </div>
+          <p className="text-white/30 text-xs">Pour acheter des photos supplémentaires, contactez-nous par email.</p>
         </div>
       )}
     </div>
