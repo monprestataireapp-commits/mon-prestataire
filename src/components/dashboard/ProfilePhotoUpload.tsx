@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Camera, Loader2 } from 'lucide-react'
+import { getPhotoUrl } from '@/lib/photo'
 
 interface Props {
   currentUrl?: string | null
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function ProfilePhotoUpload({ currentUrl, type, size = 80, onUploaded }: Props) {
-  const [url, setUrl] = useState(currentUrl || '')
+  const [url, setUrl] = useState(getPhotoUrl(currentUrl, ''))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
@@ -29,7 +30,7 @@ export function ProfilePhotoUpload({ currentUrl, type, size = 80, onUploaded }: 
       const res = await fetch('/api/providers/profile-photo', { method: 'POST', body: formData })
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Erreur'); return }
-      setUrl(data.url)
+      setUrl(getPhotoUrl(data.url))
       onUploaded?.(data.url)
     } finally {
       setLoading(false)
