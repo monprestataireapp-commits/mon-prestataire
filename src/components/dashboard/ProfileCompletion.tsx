@@ -1,7 +1,8 @@
 ﻿'use client'
 
-import { CheckCircle2, Circle, ChevronRight } from 'lucide-react'
+import { CheckCircle2, Circle, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 interface Step {
   label: string
@@ -29,6 +30,8 @@ interface Props {
 }
 
 export function ProfileCompletion({ provider }: Props) {
+  const [expanded, setExpanded] = useState(false)
+
   const steps: Step[] = [
     { label: 'Description rédigée', done: !!provider.description && provider.description.length >= 100, href: '/dashboard/modifier' },
     { label: 'Photo de profil', done: !!provider.profilePhoto, href: '/dashboard/modifier' },
@@ -50,7 +53,8 @@ export function ProfileCompletion({ provider }: Props) {
 
   const color = pct < 40 ? 'bg-rose' : pct < 70 ? 'bg-gold' : 'bg-green-400'
   const textColor = pct < 40 ? 'text-rose' : pct < 70 ? 'text-gold' : 'text-green-400'
-  const remaining = steps.filter(s => !s.done).slice(0, 3)
+  const incomplete = steps.filter(s => !s.done)
+  const visibleSteps = expanded ? steps : incomplete.slice(0, 3)
 
   return (
     <div className="bg-dark-card border border-dark-border rounded-2xl p-5 mb-6">
@@ -68,25 +72,33 @@ export function ProfileCompletion({ provider }: Props) {
       </p>
 
       <div className="space-y-2">
-        {remaining.map(step => (
+        {(expanded ? steps : incomplete.slice(0, 3)).map(step => (
           <div key={step.label} className="flex items-center gap-2.5 text-sm">
-            <Circle size={14} className="text-white/20 shrink-0" />
-            {step.href ? (
+            {step.done
+              ? <CheckCircle2 size={14} className="text-green-400 shrink-0" />
+              : <Circle size={14} className="text-white/20 shrink-0" />
+            }
+            {step.href && !step.done ? (
               <Link href={step.href} className="text-white/50 hover:text-white transition-colors flex items-center gap-1">
                 {step.label} <ChevronRight size={12} />
               </Link>
             ) : (
-              <span className="text-white/50">{step.label}</span>
+              <span className={step.done ? 'text-white/30 line-through' : 'text-white/50'}>{step.label}</span>
             )}
           </div>
         ))}
       </div>
 
-      {steps.filter(s => !s.done).length > 3 && (
-        <p className="text-white/30 text-xs mt-2">
-          +{steps.filter(s => !s.done).length - 3} autres étapes à compléter
-        </p>
-      )}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="flex items-center gap-1 text-white/30 hover:text-white/60 text-xs mt-3 transition-colors"
+      >
+        {expanded ? (
+          <><ChevronUp size={12} /> Réduire</>
+        ) : (
+          <><ChevronDown size={12} /> Voir toutes les étapes ({incomplete.length} restantes)</>
+        )}
+      </button>
     </div>
   )
 }
