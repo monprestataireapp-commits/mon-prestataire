@@ -1,14 +1,19 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
-import { MapPin, Calendar, Euro, MessageSquare, Plus, X, Send } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { MapPin, Calendar, Euro, MessageSquare, Plus, X, Send, ChevronDown, ChevronUp } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
 import { CATEGORIES } from '@/lib/categories'
 import { formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { getPhotoUrl } from '@/lib/photo'
 
 function DemandesContent() {
   const { data: session } = useSession()
+  const router = useRouter()
   const [requests, setRequests] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -18,8 +23,11 @@ function DemandesContent() {
   const [responding, setResponding] = useState<string | null>(null)
   const [responseMsg, setResponseMsg] = useState('')
   const [responsePrice, setResponsePrice] = useState('')
+  const [responseError, setResponseError] = useState('')
+  const [expandedResponses, setExpandedResponses] = useState<Set<string>>(new Set())
 
   const isProvider = (session?.user as any)?.role === 'PROVIDER'
+  const isLoggedIn = !!session?.user
 
   const [form, setForm] = useState({
     title: '', description: '', categoryId: '', city: '', region: '', budget: '', eventDate: '',
@@ -34,15 +42,27 @@ function DemandesContent() {
 
   useEffect(() => { loadRequests() }, [])
 
+  function handlePublishClick() {
+    if (!isLoggedIn) {
+      router.push('/connexion?redirect=/demandes')
+    } else {
+      setShowForm(!showForm)
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
     try {
-      await fetch('/api/requests', {
+      const res = await fetch('/api/requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
+      if (res.status === 401) {
+        router.push('/connexion?redirect=/demandes')
+        return
+      }
       setDone(true)
       setShowForm(false)
       setForm({ title: '', description: '', categoryId: '', city: '', region: '', budget: '', eventDate: '' })
@@ -54,15 +74,30 @@ function DemandesContent() {
 
   async function respond(requestId: string) {
     if (!responseMsg.trim()) return
-    await fetch(`/api/requests/${requestId}`, {
+    setResponseError('')
+    const res = await fetch(`/api/requests/${requestId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: responseMsg, price: responsePrice }),
     })
+    const data = await res.json()
+    if (!res.ok) {
+      setResponseError(data.error || 'Erreur lors de l\'envoi')
+      return
+    }
     setResponding(null)
     setResponseMsg('')
     setResponsePrice('')
     loadRequests()
+  }
+
+  function toggleResponses(id: string) {
+    setExpandedResponses(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
 
   return (
@@ -75,7 +110,7 @@ function DemandesContent() {
           </h1>
           <p className="text-white/40 text-sm">{total} demande{total > 1 ? 's' : ''} en ligne</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)}
+        <button onClick={handlePublishClick}
           className={cn('flex items-center gap-2 text-sm', showForm ? 'btn-secondary' : 'btn-primary')}>
           {showForm ? <><X size={15} /> Annuler</> : <><Plus size={15} /> Publier une demande</>}
         </button>
@@ -155,64 +190,122 @@ function DemandesContent() {
           <p className="text-5xl mb-4">📋</p>
           <p className="font-cormorant text-2xl text-white mb-2">Aucune demande pour le moment</p>
           <p className="text-white/40 text-sm mb-6">Soyez le premier à publier une demande !</p>
-          <button onClick={() => setShowForm(true)} className="btn-primary">
+          <button onClick={handlePublishClick} className="btn-primary">
             Publier une demande
           </button>
         </div>
       ) : (
         <div className="space-y-4">
-          {requests.map(req => (
-            <div key={req.id} className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden hover:border-rose/20 transition-colors">
-              <div className="p-5">
-                <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-3 mb-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-cormorant text-xl font-semibold text-white mb-1">{req.title}</h3>
-                    <div className="flex flex-wrap gap-3 text-xs text-white/40">
-                      {req.city && <span className="flex items-center gap-1"><MapPin size={11} /> {req.city}{req.region ? `, ${req.region}` : ''}</span>}
-                      {req.budget && <span className="flex items-center gap-1"><Euro size={11} /> Budget : {req.budget}€ max</span>}
-                      {req.eventDate && <span className="flex items-center gap-1"><Calendar size={11} /> {formatDate(req.eventDate)}</span>}
-                      <span className="text-white/20">Publié le {formatDate(req.createdAt)}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/30 text-xs shrink-0">
-                    <MessageSquare size={13} />
-                    <span>{req._count?.responses || 0} réponse{(req._count?.responses || 0) > 1 ? 's' : ''}</span>
-                  </div>
-                </div>
-
-                <p className="text-white/60 text-sm leading-relaxed">{req.description}</p>
-
-                {/* Bouton répondre (prestataire uniquement) */}
-                {isProvider && (
-                  <div className="mt-4">
-                    {responding === req.id ? (
-                      <div className="space-y-3">
-                        <textarea value={responseMsg} onChange={e => setResponseMsg(e.target.value)} rows={3}
-                          className="input-dark text-sm resize-none"
-                          placeholder="Votre message au client : décrivez votre offre, votre disponibilité, votre tarif…" />
-                        <div className="flex gap-3">
-                          <input type="number" min="0" value={responsePrice} onChange={e => setResponsePrice(e.target.value)}
-                            className="input-dark text-sm w-32" placeholder="Tarif (€)" />
-                          <button onClick={() => respond(req.id)} disabled={!responseMsg.trim()}
-                            className="btn-primary text-sm py-2 flex items-center gap-1 flex-1">
-                            <Send size={14} /> Envoyer ma réponse
-                          </button>
-                          <button onClick={() => setResponding(null)} className="btn-secondary text-sm py-2 px-3">
-                            <X size={14} />
-                          </button>
-                        </div>
+          {requests.map(req => {
+            const responseCount = req._count?.responses || 0
+            const showingResponses = expandedResponses.has(req.id)
+            return (
+              <div key={req.id} className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden hover:border-rose/20 transition-colors">
+                <div className="p-5">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-3 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-cormorant text-xl font-semibold text-white mb-1">{req.title}</h3>
+                      <div className="flex flex-wrap gap-3 text-xs text-white/40">
+                        {req.city && <span className="flex items-center gap-1"><MapPin size={11} /> {req.city}{req.region ? `, ${req.region}` : ''}</span>}
+                        {req.budget && <span className="flex items-center gap-1"><Euro size={11} /> Budget : {req.budget}€ max</span>}
+                        {req.eventDate && <span className="flex items-center gap-1"><Calendar size={11} /> {formatDate(req.eventDate)}</span>}
+                        <span className="text-white/20">Publié le {formatDate(req.createdAt)}</span>
                       </div>
-                    ) : (
-                      <button onClick={() => setResponding(req.id)}
-                        className="btn-secondary text-sm py-1.5 px-4 flex items-center gap-1">
-                        <MessageSquare size={13} /> Répondre à cette demande
+                    </div>
+                    {responseCount > 0 && (
+                      <button onClick={() => toggleResponses(req.id)}
+                        className="flex items-center gap-1.5 text-xs text-rose/80 hover:text-rose transition-colors shrink-0">
+                        <MessageSquare size={13} />
+                        <span>{responseCount} réponse{responseCount > 1 ? 's' : ''}</span>
+                        {showingResponses ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                       </button>
                     )}
+                    {responseCount === 0 && (
+                      <div className="flex items-center gap-1.5 text-white/30 text-xs shrink-0">
+                        <MessageSquare size={13} />
+                        <span>0 réponse</span>
+                      </div>
+                    )}
                   </div>
-                )}
+
+                  <p className="text-white/60 text-sm leading-relaxed">{req.description}</p>
+
+                  {/* Réponses publiques */}
+                  {showingResponses && req.responses?.length > 0 && (
+                    <div className="mt-4 space-y-3 border-t border-dark-border pt-4">
+                      <p className="text-xs text-white/30 uppercase tracking-widest">Réponses des prestataires</p>
+                      {req.responses.map((r: any) => (
+                        <div key={r.id} className="flex gap-3 bg-dark/40 rounded-xl p-3">
+                          <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 bg-dark-border">
+                            <Image
+                              src={getPhotoUrl(r.provider?.profilePhoto, '/placeholder-provider.svg')}
+                              alt={r.provider?.businessName || 'Prestataire'}
+                              fill className="object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <Link href={`/prestataire/${r.provider?.slug}`}
+                                className="text-sm font-medium text-white hover:text-rose transition-colors truncate">
+                                {r.provider?.businessName}
+                              </Link>
+                              {r.price && (
+                                <span className="text-xs text-gold shrink-0">{r.price}€</span>
+                              )}
+                            </div>
+                            <p className="text-white/60 text-sm leading-relaxed">{r.message}</p>
+                            <p className="text-white/20 text-xs mt-1">{formatDate(r.createdAt)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Bouton répondre (prestataire uniquement) */}
+                  {isProvider && (
+                    <div className="mt-4">
+                      {responding === req.id ? (
+                        <div className="space-y-3">
+                          <textarea value={responseMsg} onChange={e => setResponseMsg(e.target.value)} rows={3}
+                            className="input-dark text-sm resize-none"
+                            placeholder="Votre message au client : décrivez votre offre, votre disponibilité, votre tarif…" />
+                          {responseError && (
+                            <p className="text-rose text-xs">{responseError}</p>
+                          )}
+                          <div className="flex gap-3">
+                            <input type="number" min="0" value={responsePrice} onChange={e => setResponsePrice(e.target.value)}
+                              className="input-dark text-sm w-32" placeholder="Tarif (€)" />
+                            <button onClick={() => respond(req.id)} disabled={!responseMsg.trim()}
+                              className="btn-primary text-sm py-2 flex items-center gap-1 flex-1">
+                              <Send size={14} /> Envoyer ma réponse
+                            </button>
+                            <button onClick={() => { setResponding(null); setResponseError('') }} className="btn-secondary text-sm py-2 px-3">
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button onClick={() => { setResponding(req.id); setResponseError('') }}
+                          className="btn-secondary text-sm py-1.5 px-4 flex items-center gap-1">
+                          <MessageSquare size={13} /> Répondre à cette demande
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* CTA connexion pour non-connectés */}
+                  {!isLoggedIn && (
+                    <div className="mt-4">
+                      <Link href="/connexion?redirect=/demandes"
+                        className="btn-secondary text-sm py-1.5 px-4 inline-flex items-center gap-1">
+                        <MessageSquare size={13} /> Répondre (connexion requise)
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
@@ -226,4 +319,3 @@ export default function DemandesPage() {
     </Suspense>
   )
 }
-

@@ -15,6 +15,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   })
   if (!provider) return NextResponse.json({ error: 'Profil prestataire requis' }, { status: 403 })
 
+  const isActive = provider.subscriptionStatus === 'active' || provider.subscriptionStatus === 'trialing'
+  if (!isActive) return NextResponse.json({ error: 'Un abonnement actif est requis pour répondre aux demandes' }, { status: 403 })
+
   const { message, price } = await req.json()
   if (!message) return NextResponse.json({ error: 'Message obligatoire' }, { status: 400 })
 

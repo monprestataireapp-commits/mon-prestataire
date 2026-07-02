@@ -14,6 +14,14 @@ export async function GET(req: NextRequest) {
       include: {
         user: { select: { name: true } },
         _count: { select: { responses: true } },
+        responses: {
+          orderBy: { createdAt: 'asc' },
+          include: {
+            provider: {
+              select: { businessName: true, slug: true, profilePhoto: true },
+            },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
@@ -27,6 +35,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
+  if (!session?.user) return NextResponse.json({ error: 'Vous devez être connecté pour publier une demande' }, { status: 401 })
+
   const body = await req.json()
   const { title, description, categoryId, city, region, budget, eventDate } = body
 
@@ -36,7 +46,7 @@ export async function POST(req: NextRequest) {
 
   const request = await prisma.clientRequest.create({
     data: {
-      userId: session?.user ? (session.user as any).id : null,
+      userId: (session.user as any).id,
       title,
       description,
       categoryId: categoryId || null,
