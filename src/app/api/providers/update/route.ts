@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest) {
     if (f in body) data[f] = body[f]
   }
 
-  const boolFields = ['isAvailableToday', 'hasDelivery', 'hasHandDelivery']
+  const boolFields = ['isAvailableToday', 'hasDelivery', 'hasHandDelivery', 'phonePublic']
   for (const f of boolFields) {
     if (f in body) data[f] = body[f]
   }

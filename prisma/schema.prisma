@@ -82,6 +82,7 @@ model Provider {
 
   // Contact
   phone             String?
+  phonePublic       Boolean   @default(false)
   website           String?
   instagramUrl      String?
   tiktokUrl         String?

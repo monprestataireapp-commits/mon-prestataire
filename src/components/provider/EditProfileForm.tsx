@@ -21,6 +21,7 @@ export function EditProfileForm({ provider }: Props) {
     businessName: provider.businessName || '',
     description: provider.description || '',
     phone: provider.phone || '',
+    phonePublic: provider.phonePublic || false,
     instagramUrl: provider.instagramUrl || '',
     tiktokUrl: provider.tiktokUrl || '',
     website: provider.website || '',
@@ -108,6 +109,15 @@ export function EditProfileForm({ provider }: Props) {
             <div>
               <label className="text-xs text-white/50 mb-1 block">Téléphone</label>
               <input value={form.phone} onChange={e => set('phone', e.target.value)} className="input-dark" />
+              <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={form.phonePublic}
+                  onChange={e => set('phonePublic', e.target.checked)}
+                  className="w-4 h-4 accent-rose rounded"
+                />
+                <span className="text-xs text-white/50">Afficher mon numéro sur mon profil public</span>
+              </label>
             </div>
             <div>
               <label className="text-xs text-white/50 mb-1 block">Années d&apos;expérience</label>

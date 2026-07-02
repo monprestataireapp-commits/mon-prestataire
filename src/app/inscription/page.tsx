@@ -20,7 +20,7 @@ export default function InscriptionPage() {
 
   const [form, setForm] = useState({
     email: '', password: '', confirmPassword: '', name: '',
-    businessName: '', description: '', phone: '', instagramUrl: '', tiktokUrl: '', website: '',
+    businessName: '', description: '', phone: '', phonePublic: false, instagramUrl: '', tiktokUrl: '', website: '',
     yearsExperience: '',
     city: '', region: '', department: '', departmentCode: '',
     hasDelivery: false, deliveryZone: '', deliveryFee: '', hasHandDelivery: false,
@@ -163,6 +163,15 @@ export default function InscriptionPage() {
               <div>
                 <label className="text-xs text-white/50 mb-1 block">Téléphone</label>
                 <input value={form.phone} onChange={e => set('phone', e.target.value)} className="input-dark" placeholder="06 00 00 00 00" />
+                <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={form.phonePublic}
+                    onChange={e => set('phonePublic', e.target.checked)}
+                    className="w-4 h-4 accent-rose rounded"
+                  />
+                  <span className="text-xs text-white/50">Afficher mon numéro sur mon profil public</span>
+                </label>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

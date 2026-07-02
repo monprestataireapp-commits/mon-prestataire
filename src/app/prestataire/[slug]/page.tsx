@@ -330,7 +330,7 @@ export default async function ProviderPage({ params }: Props) {
           <div className="bg-dark-card border border-dark-border rounded-2xl p-5">
             <h3 className="font-cormorant text-lg font-semibold text-white mb-4">Contact</h3>
 
-            {isStandardOrHigher && provider.phone && (
+            {isStandardOrHigher && provider.phone && provider.phonePublic && (
               <a
                 href={`tel:${provider.phone}`}
                 className="flex items-center gap-3 bg-rose/10 border border-rose/20 rounded-xl px-4 py-3 hover:bg-rose/20 transition-colors mb-3"

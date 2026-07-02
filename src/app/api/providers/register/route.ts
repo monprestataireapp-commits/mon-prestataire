@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const {
       email, password, name, businessName, description,
       city, department, departmentCode, region,
-      phone, instagramUrl, tiktokUrl, website,
+      phone, phonePublic, instagramUrl, tiktokUrl, website,
       categories, specialties, yearsExperience,
       hasDelivery, deliveryZone, deliveryFee, hasHandDelivery,
       priceMin, priceMax,
@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
             region: region || '',
             country: 'FR',
             phone,
+            phonePublic: phonePublic || false,
             instagramUrl,
             tiktokUrl,
             website,
