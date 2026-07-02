@@ -12,6 +12,9 @@ function RechercheContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
+  const bienvenue = searchParams.get('bienvenue') === '1'
+  const [showBienvenue, setShowBienvenue] = useState(bienvenue)
+
   const [providers, setProviders] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [pages, setPages] = useState(1)
@@ -99,6 +102,18 @@ function RechercheContent() {
 
   return (
     <div className="min-h-screen">
+      {/* Message bienvenue après inscription cliente */}
+      {showBienvenue && (
+        <div className="bg-rose/10 border-b border-rose/20 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <p className="text-white text-sm">
+              🎉 <strong>Bienvenue sur MonPrestataire !</strong> Votre compte a été créé. Explorez nos prestataires et trouvez la perle rare pour votre événement.
+            </p>
+            <button onClick={() => setShowBienvenue(false)} className="text-white/50 hover:text-white shrink-0 text-lg leading-none">✕</button>
+          </div>
+        </div>
+      )}
+
       {/* Header recherche */}
       <div className="bg-dark-card border-b border-dark-border py-6 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">

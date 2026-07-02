@@ -32,7 +32,7 @@ export default function InscriptionClientPage() {
     }
 
     await signIn('credentials', { email, password, redirect: false })
-    router.push('/espace-client')
+    router.push('/recherche?bienvenue=1')
   }
 
   return (
