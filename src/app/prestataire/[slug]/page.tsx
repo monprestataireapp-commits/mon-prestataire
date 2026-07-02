@@ -9,6 +9,7 @@ import { PhotoLightbox } from '@/components/provider/PhotoLightbox'
 import { ShareButton } from '@/components/provider/ShareButton'
 import { ViewTracker } from '@/components/provider/ViewTracker'
 import { ProfileAvatarEdit } from '@/components/provider/ProfileAvatarEdit'
+import { CoverPhotoEdit } from '@/components/provider/CoverPhotoEdit'
 import { getPhotoUrl } from '@/lib/photo'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
@@ -131,15 +132,11 @@ export default async function ProviderPage({ params }: Props) {
       {/* Header profil */}
       <div className="bg-dark-card border border-dark-border rounded-3xl overflow-hidden mb-6">
         {/* Cover */}
-        <div className="relative h-48 sm:h-64">
-          <Image
-            src={getPhotoUrl(provider.coverPhoto || provider.photos[0]?.url || provider.profilePhoto, 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&q=80')}
-            alt={provider.businessName}
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-dark-card via-dark-card/20 to-transparent" />
-        </div>
+        <CoverPhotoEdit
+          currentPhoto={provider.coverPhoto || provider.photos[0]?.url || provider.profilePhoto}
+          fallback="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&q=80"
+          isOwner={isOwner}
+        />
 
         <div className="px-6 pb-6">
           {/* Avatar + infos */}
@@ -283,7 +280,15 @@ export default async function ProviderPage({ params }: Props) {
               <h2 className="font-cormorant text-xl font-semibold text-white mb-4">
                 Galerie ({provider.photos.length} photo{provider.photos.length > 1 ? 's' : ''})
               </h2>
-              <PhotoLightbox photos={provider.photos.slice(0, isPremium ? 50 : 20)} businessName={provider.businessName} />
+              <PhotoLightbox
+                photos={provider.photos.slice(0, isPremium ? undefined : 3)}
+                businessName={provider.businessName}
+              />
+              {!isPremium && provider.photos.length > 3 && (
+                <p className="text-white/30 text-xs mt-3 text-center">
+                  +{provider.photos.length - 3} photos supplémentaires disponibles avec l&apos;offre Premium
+                </p>
+              )}
             </div>
           )}
 
