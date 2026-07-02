@@ -9,6 +9,8 @@ import { PhotoLightbox } from '@/components/provider/PhotoLightbox'
 import { ShareButton } from '@/components/provider/ShareButton'
 import { ViewTracker } from '@/components/provider/ViewTracker'
 import { getPhotoUrl } from '@/lib/photo'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { ReportButton } from '@/components/provider/ReportButton'
 import { DevisButton } from '@/components/provider/DevisButton'
 
@@ -63,8 +65,10 @@ async function getProvider(slug: string) {
 }
 
 export default async function ProviderPage({ params }: Props) {
-  const provider = await getProvider(params.slug)
-  if (!provider || !provider.isPublished) notFound()
+  const [provider, session] = await Promise.all([getProvider(params.slug), getServerSession(authOptions)])
+  if (!provider) notFound()
+  const isOwner = (session?.user as any)?.id === provider.userId
+  if (!provider.isPublished && !isOwner) notFound()
 
   const avgRating = provider.reviews.length
     ? Math.round(provider.reviews.reduce((s, r) => s + r.rating, 0) / provider.reviews.length * 10) / 10
@@ -107,6 +111,17 @@ export default async function ProviderPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ViewTracker slug={provider.slug} />
+
+      {/* Bannière prévisualisation (visible uniquement par la propriétaire) */}
+      {isOwner && !provider.isPublished && (
+        <div className="bg-gold/10 border border-gold/30 rounded-2xl px-4 py-3 mb-6 flex items-center justify-between gap-4">
+          <p className="text-gold text-sm">
+            👁️ <strong>Mode prévisualisation</strong> — Votre profil est actuellement invisible pour les clientes. Activez votre abonnement pour apparaître dans les recherches.
+          </p>
+          <Link href="/abonnement" className="btn-gold text-xs py-1.5 px-3 shrink-0">Activer</Link>
+        </div>
+      )}
+
       {/* Back */}
       <Link href="/recherche" className="inline-flex items-center gap-2 text-white/40 hover:text-white text-sm mb-6 transition-colors">
         <ArrowLeft size={15} /> Retour aux résultats
