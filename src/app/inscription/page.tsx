@@ -7,16 +7,17 @@ import { signIn } from 'next-auth/react'
 import { CATEGORIES } from '@/lib/categories'
 import { SPECIALTIES } from '@/lib/specialties'
 import { DEPARTMENTS_FRANCE, REGIONS_FRANCE } from '@/lib/utils'
-import { Check, ChevronRight, ChevronLeft } from 'lucide-react'
+import { Check, ChevronRight, ChevronLeft, Zap, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const STEPS = ['Compte', 'Profil', 'Localisation', 'Livraison', 'Catégories', 'Spécialités']
+const STEPS = ['Compte', 'Profil', 'Localisation', 'Livraison', 'Catégories', 'Spécialités', 'Abonnement']
 
 export default function InscriptionPage() {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [foundingCount, setFoundingCount] = useState<number | null>(null)
 
   const [form, setForm] = useState({
     email: '', password: '', confirmPassword: '', name: '',
@@ -59,7 +60,7 @@ export default function InscriptionPage() {
 
   const hasSpecialties = availableSpecialties.length > 0
 
-  async function submit() {
+  async function submitAndGoToAbonnement() {
     setLoading(true)
     setError('')
     try {
@@ -71,14 +72,38 @@ export default function InscriptionPage() {
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Erreur'); return }
       await signIn('credentials', { email: form.email, password: form.password, redirect: false })
-      router.push('/bienvenue')
+      // Récupérer le nombre de membres fondateurs
+      const cfg = await fetch('/api/config/founding-count').then(r => r.json()).catch(() => ({ count: 0 }))
+      setFoundingCount(cfg.count ?? 0)
+      setStep(s => s + 1)
     } finally {
       setLoading(false)
     }
   }
 
-  // Étapes effectives (on saute Spécialités si aucune dispo)
-  const totalSteps = hasSpecialties ? STEPS.length : STEPS.length - 1
+  async function subscribe() {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planKey: 'standard_monthly' }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else setError('Erreur lors de la redirection vers le paiement')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Étapes effectives : Spécialités sautée si aucune dispo, Abonnement toujours en dernier
+  const baseSteps = hasSpecialties ? STEPS : STEPS.filter(s => s !== 'Spécialités')
+  const stepLabels = baseSteps
+  const totalSteps = stepLabels.length
+  const isLastBeforeAbonnement = stepLabels[step] === (hasSpecialties ? 'Spécialités' : 'Catégories')
+  const isAbonnementStep = stepLabels[step] === 'Abonnement'
 
   function next() {
     if (step === 0) {
@@ -87,15 +112,11 @@ export default function InscriptionPage() {
       if (form.password.length < 8) { setError('Mot de passe trop court (8 caractères minimum)'); return }
     }
     if (step === 1 && !form.businessName) { setError('Nom de votre activité obligatoire'); return }
-    if (step === 4 && form.categories.length === 0) { setError('Sélectionnez au moins une catégorie'); return }
+    if (stepLabels[step] === 'Catégories' && form.categories.length === 0) { setError('Sélectionnez au moins une catégorie'); return }
     setError('')
-    // Si étape catégories et pas de spécialités → soumettre directement
-    if (step === 4 && !hasSpecialties) { submit(); return }
+    if (isLastBeforeAbonnement) { submitAndGoToAbonnement(); return }
     if (step < totalSteps - 1) setStep(s => s + 1)
-    else submit()
   }
-
-  const stepLabels = hasSpecialties ? STEPS : STEPS.slice(0, -1)
 
   return (
     <div className="min-h-screen py-10 px-4">
@@ -357,20 +378,79 @@ export default function InscriptionPage() {
             </div>
           )}
 
+          {/* Étape Abonnement */}
+          {isAbonnementStep && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="font-cormorant text-3xl font-bold text-white mb-2">Dernière étape 🎉</h2>
+                <p className="text-white/50 text-sm">Votre profil est créé ! Activez votre abonnement pour être visible.</p>
+              </div>
+
+              {/* Alerte visibilité */}
+              <div className="flex items-start gap-3 bg-dark border border-white/10 rounded-xl p-4">
+                <EyeOff size={18} className="text-white/40 shrink-0 mt-0.5" />
+                <p className="text-white/50 text-sm">Sans abonnement, votre profil est <strong className="text-white">invisible</strong> pour les clientes. Activez-le maintenant pour apparaître dans les recherches.</p>
+              </div>
+
+              {/* Offre */}
+              <div className="border border-gold/30 bg-gold/5 rounded-2xl p-6 text-center">
+                <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
+                  <Zap size={12} /> Offre lancement
+                </div>
+                {foundingCount !== null && foundingCount < 100 ? (
+                  <>
+                    <p className="font-cormorant text-4xl font-bold text-white mb-1">
+                      6 mois <span className="text-gradient-rose-gold">gratuits</span>
+                    </p>
+                    <p className="text-white/50 text-sm mb-2">Pour les 100 premières prestataires — encore <strong className="text-gold">{100 - foundingCount} places</strong> disponibles</p>
+                    <p className="text-white/40 text-xs mb-5">Puis seulement <strong className="text-white">4,99€/mois</strong> — sans engagement, résiliable à tout moment</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-cormorant text-4xl font-bold text-white mb-1">
+                      <span className="text-gradient-rose-gold">4,99€</span>/mois
+                    </p>
+                    <p className="text-white/50 text-sm mb-5">Sans engagement — résiliable à tout moment</p>
+                  </>
+                )}
+                <ul className="text-left space-y-2 mb-6 max-w-xs mx-auto">
+                  {['Profil visible dans toutes les recherches', 'Photos & vidéos illimitées', 'Avis clients vérifiés', 'Tableau de bord complet'].map(item => (
+                    <li key={item} className="flex items-center gap-2 text-sm text-white/70">
+                      <Check size={14} className="text-gold shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={subscribe} disabled={loading} className="btn-gold w-full flex items-center justify-center gap-2 text-base py-3">
+                  {loading ? 'Redirection…' : foundingCount !== null && foundingCount < 100 ? '🎉 Profiter des 6 mois gratuits' : 'Activer mon abonnement'}
+                </button>
+                <p className="text-white/20 text-xs mt-3">Paiement sécurisé via Stripe · CB, Apple Pay, Google Pay</p>
+              </div>
+
+              <div className="text-center">
+                <button onClick={() => router.push('/dashboard')} className="text-white/30 text-xs hover:text-white/50 underline">
+                  Passer pour l'instant (profil invisible)
+                </button>
+              </div>
+            </div>
+          )}
+
           {error && <p className="text-rose text-sm mt-4">{error}</p>}
 
           {/* Navigation */}
-          <div className="flex gap-3 mt-8">
-            {step > 0 && (
-              <button onClick={() => setStep(s => s - 1)} className="btn-secondary flex items-center gap-1">
-                <ChevronLeft size={16} /> Précédent
+          {!isAbonnementStep && (
+            <div className="flex gap-3 mt-8">
+              {step > 0 && (
+                <button onClick={() => setStep(s => s - 1)} className="btn-secondary flex items-center gap-1">
+                  <ChevronLeft size={16} /> Précédent
+                </button>
+              )}
+              <button onClick={next} disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-1">
+                {loading ? 'Création en cours…' : isLastBeforeAbonnement ? 'Continuer' : 'Suivant'}
+                {!loading && <ChevronRight size={16} />}
               </button>
-            )}
-            <button onClick={next} disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-1">
-              {loading ? 'Création…' : step === totalSteps - 1 ? 'Créer mon profil' : 'Suivant'}
-              {!loading && step < totalSteps - 1 && <ChevronRight size={16} />}
-            </button>
-          </div>
+            </div>
+          )}
         </div>
 
         <p className="text-center text-white/30 text-xs mt-4">
