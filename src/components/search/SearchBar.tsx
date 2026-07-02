@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Sparkles, X, Loader2 } from 'lucide-react'
 import Image from 'next/image'
+import { getPhotoUrl } from '@/lib/photo'
 
 interface SearchResult {
   id: string
@@ -135,7 +136,7 @@ export function SearchBar({ className = '' }: { className?: string }) {
             >
               <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-dark">
                 {r.profilePhoto && (
-                  <Image src={r.profilePhoto} alt={r.businessName} width={40} height={40} className="object-cover w-full h-full" />
+                  <Image src={getPhotoUrl(r.profilePhoto)} alt={r.businessName} width={40} height={40} className="object-cover w-full h-full" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
