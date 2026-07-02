@@ -421,8 +421,8 @@ export function AdminPanel() {
                       </button>
                     ) : (
                       <button onClick={() => providerAction(p.id, 'unverify')} title="Retirer la vérification"
-                        className="w-8 h-8 rounded-lg bg-green-500/20 hover:bg-rose/20 text-green-400 hover:text-rose flex items-center justify-center transition-colors">
-                        <CheckCircle size={15} />
+                        className="flex items-center gap-1 px-2 h-8 rounded-lg bg-green-500/20 hover:bg-rose/20 text-green-400 hover:text-rose text-xs transition-colors">
+                        <CheckCircle size={13} /> Retirer
                       </button>
                     )}
                     {!p.isPublished ? (
