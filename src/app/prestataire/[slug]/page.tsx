@@ -8,6 +8,7 @@ import { ReviewForm } from '@/components/provider/ReviewForm'
 import { PhotoLightbox } from '@/components/provider/PhotoLightbox'
 import { ShareButton } from '@/components/provider/ShareButton'
 import { ViewTracker } from '@/components/provider/ViewTracker'
+import { ProfileAvatarEdit } from '@/components/provider/ProfileAvatarEdit'
 import { getPhotoUrl } from '@/lib/photo'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
@@ -143,15 +144,11 @@ export default async function ProviderPage({ params }: Props) {
         <div className="px-6 pb-6">
           {/* Avatar + infos */}
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12 relative">
-            <div className="w-24 h-24 rounded-2xl border-4 border-dark-card overflow-hidden shrink-0 bg-dark">
-              {provider.profilePhoto ? (
-                <Image src={getPhotoUrl(provider.profilePhoto)} alt={provider.businessName} width={96} height={96} className="object-cover w-full h-full" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-rose to-gold flex items-center justify-center text-3xl text-white font-bold font-cormorant">
-                  {provider.businessName[0]}
-                </div>
-              )}
-            </div>
+            <ProfileAvatarEdit
+              currentPhoto={provider.profilePhoto}
+              businessName={provider.businessName}
+              isOwner={isOwner}
+            />
 
             <div className="flex-1 min-w-0 pt-4 sm:pt-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
