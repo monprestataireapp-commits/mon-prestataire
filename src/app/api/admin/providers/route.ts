@@ -45,6 +45,11 @@ export async function PATCH(req: NextRequest) {
         p.slug,
       ).catch(() => {})
     }
+  } else if (action === 'unverify') {
+    await prisma.provider.update({
+      where: { id: providerId },
+      data: { isVerified: false },
+    })
   } else if (action === 'publish') {
     await prisma.provider.update({
       where: { id: providerId },
