@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from 'next-auth/react'
+import { signIn } from 'next-auth/reacht'
 import { CATEGORIES } from '@/lib/categories'
 import { SPECIALTIES } from '@/lib/specialties'
 import { DEPARTMENTS_FRANCE, REGIONS_FRANCE } from '@/lib/utils'
 import { Check, ChevronRight, ChevronLeft, Zap, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const STEPS = ['Compte', 'Profil', 'Localisation', 'Livraison', 'Catégories', 'Spécialités', 'Abonnement']
+const STEPS = ['Compte', 'Profil', 'Localisation', 'Livraison', 'Catégories', 'Spécialités']
 
 export default function InscriptionPage() {
   const router = useRouter()
@@ -83,9 +83,8 @@ export default function InscriptionPage() {
       await signIn('credentials', { email: form.email, password: form.password, redirect: false })
       // Récupérer le nombre de membres fondateurs
       const cfg = await fetch('/api/config/founding-count').then(r => r.json()).catch(() => ({ count: 0 }))
-      setFoundingCount(cfg.count ?? 0)
-      setStep(s => s + 1)
-    } finally {
+      router.push('/dashboard?welcome=true')
+      finally {
       setLoading(false)
     }
   }
@@ -134,7 +133,7 @@ export default function InscriptionPage() {
           <h1 className="font-cormorant text-4xl font-bold text-gradient-rose-gold mb-2">
             Devenir prestataire
           </h1>
-          <p className="text-white/50 text-sm">Créez votre profil et rejoignez la communauté MonPrestataire</p>
+          <p className="text-white/50 text-sm">Inscription 100% gratuite — Créez votre profil et rejoignez la communaut</p>
         </div>
 
         {/* Stepper */}
