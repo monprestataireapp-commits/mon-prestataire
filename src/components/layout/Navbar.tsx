@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { Menu, X, Heart, Search, ChevronDown, LayoutDashboard, LogOut, Shield, FileText } from 'lucide-react'
+import { Menu, X, Heart, Search, ChevronDown, LayoutDashboard, LogOut, Shield, FileText, Map } from 'lucide-react'
 import { NotificationBadge } from './NotificationBadge'
 
 export function Navbar() {
@@ -29,6 +29,10 @@ export function Navbar() {
             <Link href="/recherche" className="text-white/70 hover:text-white transition-colors text-sm flex items-center gap-1">
               <Search size={15} />
               Rechercher
+            </Link>
+            <Link href="/carte" className="text-white/70 hover:text-white transition-colors text-sm flex items-center gap-1">
+              <Map size={15} />
+              Carte
             </Link>
             <Link href="/demandes" className="text-white/70 hover:text-white transition-colors text-sm">
               Demandes clients
@@ -130,6 +134,9 @@ export function Navbar() {
         <div className="md:hidden bg-dark-card border-t border-dark-border px-4 py-4 space-y-3">
           <Link href="/recherche" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-white/80 py-2">
             <Search size={16} /> Rechercher
+          </Link>
+          <Link href="/carte" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-white/80 py-2">
+            <Map size={16} /> Carte
           </Link>
           <Link href="/demandes" onClick={() => setMobileOpen(false)} className="block text-white/80 py-2">
             Demandes clients

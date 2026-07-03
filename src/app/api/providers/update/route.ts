@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { geocodeCity } from '@/lib/geocode'
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -33,6 +34,12 @@ export async function PATCH(req: NextRequest) {
   if ('yearsExperience' in body) data.yearsExperience = body.yearsExperience ? parseInt(body.yearsExperience) : null
   if ('priceMin' in body) data.priceMin = body.priceMin ? parseInt(body.priceMin) : null
   if ('priceMax' in body) data.priceMax = body.priceMax ? parseInt(body.priceMax) : null
+
+  // Regéocoder si la ville a changé
+  if ('city' in body) {
+    const coords = await geocodeCity(body.city, body.region || provider.region)
+    if (coords) { data.latitude = coords.lat; data.longitude = coords.lng }
+  }
 
   if (Object.keys(data).length > 0) {
     await prisma.provider.update({ where: { id: provider.id }, data })

@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs'
 import { slugify } from '@/lib/utils'
 import { sendWelcomeEmail, sendAdminNewUserEmail } from '@/lib/email'
 import { rateLimit, getIp } from '@/lib/rateLimit'
+import { geocodeCity } from '@/lib/geocode'
 
 export async function POST(req: NextRequest) {
   if (!rateLimit(getIp(req), 10, 60 * 60 * 1000)) {
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
             departmentCode: departmentCode || '',
             region: region || '',
             country: 'FR',
+            ...await geocodeCity(city, region).then(c => c ? { latitude: c.lat, longitude: c.lng } : {}),
             phone,
             phonePublic: phonePublic || false,
             instagramUrl,
