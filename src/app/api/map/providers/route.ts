@@ -19,7 +19,7 @@ export async function GET() {
       longitude: true,
       isVerified: true,
       categories: {
-        include: { category: { select: { slug: true, name: true, emoji: true, color: true } } },
+        include: { category: { select: { slug: true, name: true, emoji: true } } },
         take: 1,
       },
     },
