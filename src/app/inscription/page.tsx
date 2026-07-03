@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from 'next-auth/reacht'
+import { signIn } from 'next-auth/react'
 import { CATEGORIES } from '@/lib/categories'
 import { SPECIALTIES } from '@/lib/specialties'
 import { DEPARTMENTS_FRANCE, REGIONS_FRANCE } from '@/lib/utils'
@@ -81,10 +81,10 @@ export default function InscriptionPage() {
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Erreur'); return }
       await signIn('credentials', { email: form.email, password: form.password, redirect: false })
-      // Récupérer le nombre de membres fondateurs
-      const cfg = await fetch('/api/config/founding-count').then(r => r.json()).catch(() => ({ count: 0 }))
+      // Inscription gratuite - rediriger vers le dashboard
+      
       router.push('/dashboard?welcome=true')
-      finally {
+      } finally {
       setLoading(false)
     }
   }
@@ -133,7 +133,7 @@ export default function InscriptionPage() {
           <h1 className="font-cormorant text-4xl font-bold text-gradient-rose-gold mb-2">
             Devenir prestataire
           </h1>
-          <p className="text-white/50 text-sm">Inscription 100% gratuite — Créez votre profil et rejoignez la communaut</p>
+          <p className="text-white/50 text-sm">Inscription 100% gratuite — Créez votre profil et rejoignez la communauté</p>
         </div>
 
         {/* Stepper */}
