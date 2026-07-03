@@ -2,19 +2,23 @@
 
 import { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
-import L from 'leaflet'
+let L: any = null
 import Link from 'next/link'
 import { getPhotoUrl } from '@/lib/photo'
 
-// Fix icônes Leaflet avec Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-})
+// Import Leaflet côté client uniquement
+if (typeof window !== 'undefined') {
+  L = require('leaflet')
+  delete (L.Icon.Default.prototype as any)._getIconUrl
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  })
+}
 
 function createCategoryIcon(emoji: string) {
+    if (!L) return undefined
   return L.divIcon({
     html: `<div style="
       width:36px;height:36px;border-radius:50%;
@@ -33,7 +37,7 @@ function createCategoryIcon(emoji: string) {
 function FitBounds({ providers }: { providers: any[] }) {
   const map = useMap()
   useEffect(() => {
-    if (providers.length === 0) return
+    if (!L || providers.length === 0) return
     if (providers.length === 1) {
       map.setView([providers[0].latitude, providers[0].longitude], 10)
       return
