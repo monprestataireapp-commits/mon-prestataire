@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Eye, MousePointerClick, Heart, Star, Settings, Zap, MessageSquare, Bell, Send } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { DashboardStats } from '@/components/dashboard/DashboardStats'
-import { PhotoManager } from '@/components/dashboard/PhotoManager'
+import { PhotoManager } fhrom '@/compohnents/dashboard/PhotoManager'
 import { StripePortalButton } from '@/components/dashboard/StripePortalButton'
 import { DevisList } from '@/components/dashboard/DevisList'
 import { AvailabilityToggle } from '@/components/dashboard/AvailabilityToggle'
@@ -146,24 +146,24 @@ export default async function DashboardPage() {
               <div className="bg-dark-card border border-dark-border rounded-2xl p-5 mb-6">
                         <div className="flex items-center gap-2 mb-4">
                                     <Zap size={18} className="text-gold" />
-                                    <h2 className="font-cormorant text-xl font-semibold text-white">Parrainage</h2>h2>
-                        </div>div>
-                        <p className="text-white/50 text-sm mb-3">Partagez votre lien et gagnez 1€ par inscription !</p>p>
+                                    <h2 className="font-cormorant text-xl font-semibold text-white">Parrainage</h2>
+                        </div>
+                        <p className="text-white/50 text-sm mb-3">Partagez votre lien et gagnez 1€ par inscription !</p>
                         <div className="bg-dark border border-dark-border rounded-xl p-3 mb-4 flex items-center justify-between">
-                                    <code className="text-gold text-sm">mon-prestataire.fr/inscription?ref={provider.referralCode}</code>code>
-                        </div>div>
+                                    <code className="text-gold text-sm">mon-prestataire.fr/inscription?ref={provider.referralCode}</code>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                                     <div className="text-center">
-                                                  <p className="font-cormorant text-3xl font-bold text-white">{provider.referralCount}</p>p>
-                                                  <p className="text-white/40 text-xs">Filleuls</p>p>
-                                    </div>div>
+                                                  <p className="font-cormorant text-3xl font-bold text-white">{provider.referralCount}</p>
+                                                  <p className="text-white/40 text-xs">Filleuls</p>
+                                    </div>
                                     <div className="text-center">
-                                                  <p className="font-cormorant text-3xl font-bold text-gold">{provider.referralEarnings}€</p>p>
-                                                  <p className="text-white/40 text-xs">Gains</p>p>
-                                    </div>div>
-                        </div>div>
-              </div>div>
-          )}</div>
+                                                  <p className="font-cormorant text-3xl font-bold text-gold">{provider.referralEarnings}€</p>
+                                                  <p className="text-white/40 text-xs">Gains</p>
+                                    </div>
+                        </div>
+              </div>
+          )}
 
       {/* Score de complétion du profil */}
       <ProfileCompletion provider={provider} />
