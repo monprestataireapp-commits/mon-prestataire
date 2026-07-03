@@ -294,12 +294,12 @@ export function AdminPanel() {
           {globalStats && (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  { label: 'Prestataires actifs', value: globalStats.providers?.active ?? 0, sub: `${globalStats.providers?.total ?? 0} total`, color: 'text-green-400', bg: 'bg-green-400/10', tab: 'providers' },
-                  { label: 'Formule Premium', value: globalStats.providers?.premium ?? 0, sub: `${globalStats.providers?.standard ?? 0} Standard`, color: 'text-gold', bg: 'bg-gold/10', tab: 'providers' },
-                  { label: 'Membres fondateurs', value: globalStats.providers?.foundingMembers ?? 0, sub: `sur 100`, color: 'text-rose', bg: 'bg-rose/10', tab: 'providers' },
-                  { label: 'Clients inscrits', value: globalStats.clients?.total ?? 0, sub: 'comptes CLIENT', color: 'text-blue-400', bg: 'bg-blue-400/10', tab: 'clients' },
-                ].map(s => (
+                {([
+                  { label: 'Prestataires actifs', value: globalStats.providers?.active ?? 0, sub: `${globalStats.providers?.total ?? 0} total`, color: 'text-green-400', bg: 'bg-green-400/10', tab: 'providers' as Tab },
+                  { label: 'Formule Premium', value: globalStats.providers?.premium ?? 0, sub: `${globalStats.providers?.standard ?? 0} Standard`, color: 'text-gold', bg: 'bg-gold/10', tab: 'providers' as Tab },
+                  { label: 'Membres fondateurs', value: globalStats.providers?.foundingMembers ?? 0, sub: `sur 100`, color: 'text-rose', bg: 'bg-rose/10', tab: 'providers' as Tab },
+                  { label: 'Clients inscrits', value: globalStats.clients?.total ?? 0, sub: 'comptes CLIENT', color: 'text-blue-400', bg: 'bg-blue-400/10', tab: 'clients' as Tab },
+                ] as const).map(s => (
                   <button key={s.label} onClick={() => setTab(s.tab)} className="bg-dark-card border border-dark-border rounded-2xl p-4 text-left hover:border-rose/30 transition-colors cursor-pointer">
                     <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
                       <TrendingUp size={16} className={s.color} />
@@ -312,12 +312,12 @@ export function AdminPanel() {
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  { label: 'Avis approuvés', value: globalStats.reviews?.total ?? 0, sub: `${globalStats.reviews?.pending ?? 0} en attente`, tab: 'reviews' },
-                  { label: 'Demandes de devis', value: globalStats.devis?.total ?? 0, sub: 'toutes periodes', tab: 'providers' },
-                  { label: 'Vues cumulées', value: (globalStats.engagement?.totalViews ?? 0).toLocaleString('fr-FR'), sub: 'profils prestataires', tab: 'stats' },
-                  { label: 'MRR estimé', value: `${globalStats.revenue?.estimatedMRR ?? 0} €`, sub: 'revenus mensuels estimés', tab: 'stats' },
-                ].map(s => (
+                {([
+                  { label: 'Avis approuvés', value: globalStats.reviews?.total ?? 0, sub: `${globalStats.reviews?.pending ?? 0} en attente`, tab: 'reviews' as Tab },
+                  { label: 'Demandes de devis', value: globalStats.devis?.total ?? 0, sub: 'toutes periodes', tab: 'providers' as Tab },
+                  { label: 'Vues cumulées', value: (globalStats.engagement?.totalViews ?? 0).toLocaleString('fr-FR'), sub: 'profils prestataires', tab: 'stats' as Tab },
+                  { label: 'MRR estimé', value: `${globalStats.revenue?.estimatedMRR ?? 0} €`, sub: 'revenus mensuels estimés', tab: 'stats' as Tab },
+                ] as const).map(s => (
                   <button key={s.label} onClick={() => setTab(s.tab)} className="bg-dark-card border border-dark-border rounded-2xl p-4 text-left hover:border-rose/30 transition-colors cursor-pointer">
                     <p className="font-cormorant text-3xl font-bold text-white">{s.value}</p>
                     <p className="text-white text-sm mt-0.5">{s.label}</p>
