@@ -15,13 +15,21 @@ export function StripePortalButton({ isActive, stripeCustomerId, isPremium }: Pr
   const [upgradeOpen, setUpgradeOpen] = useState(false)
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly')
   const [upgraded, setUpgraded] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function openPortal() {
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch('/api/stripe/portal', { method: 'POST' })
       const data = await res.json()
-      if (data.url) window.location.href = data.url
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        setError(data.error || 'Impossible d\'ouvrir le portail de paiement.')
+      }
+    } catch {
+      setError('Erreur de connexion. Veuillez réessayer.')
     } finally {
       setLoading(false)
     }
@@ -29,17 +37,23 @@ export function StripePortalButton({ isActive, stripeCustomerId, isPremium }: Pr
 
   async function doUpgrade() {
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch('/api/stripe/upgrade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ billing }),
       })
+      const data = await res.json()
       if (res.ok) {
         setUpgraded(true)
         setUpgradeOpen(false)
         setTimeout(() => window.location.reload(), 1500)
+      } else {
+        setError(data.error || 'Une erreur est survenue. Veuillez réessayer.')
       }
+    } catch {
+      setError('Erreur de connexion. Veuillez réessayer.')
     } finally {
       setLoading(false)
     }
@@ -120,6 +134,7 @@ export function StripePortalButton({ isActive, stripeCustomerId, isPremium }: Pr
                       Confirmer l'upgrade
                     </button>
                   </div>
+                  {error && <p className="text-red-400 text-xs font-medium">{error}</p>}
                   <p className="text-white/30 text-xs">Prise d'effet immédiate · Prorata calculé</p>
                 </div>
               )}

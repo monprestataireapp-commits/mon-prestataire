@@ -26,21 +26,30 @@ export async function POST(req: NextRequest) {
   }
 
   const priceId = billing === 'yearly'
-    ? process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID!
-    : process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID!
+    ? process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID
+    : process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID
 
-  const subscription = await stripe.subscriptions.retrieve(provider.stripeSubscriptionId)
-  const item = subscription.items.data[0]
+  if (!priceId || priceId.startsWith('price_REMPLACER') || priceId === 'price_premium_monthly' || priceId === 'price_premium_yearly') {
+    return NextResponse.json({ error: 'L\'offre Premium n\'est pas encore disponible. Contactez-nous.' }, { status: 400 })
+  }
 
-  await stripe.subscriptions.update(provider.stripeSubscriptionId, {
-    items: [{ id: item.id, price: priceId }],
-    proration_behavior: 'always_invoice',
-  })
+  try {
+    const subscription = await stripe.subscriptions.retrieve(provider.stripeSubscriptionId)
+    const item = subscription.items.data[0]
 
-  await prisma.provider.update({
-    where: { id: provider.id },
-    data: { subscriptionPlan: 'premium' },
-  })
+    await stripe.subscriptions.update(provider.stripeSubscriptionId, {
+      items: [{ id: item.id, price: priceId }],
+      proration_behavior: 'always_invoice',
+    })
 
-  return NextResponse.json({ success: true })
+    await prisma.provider.update({
+      where: { id: provider.id },
+      data: { subscriptionPlan: 'premium' },
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (err: any) {
+    console.error('Stripe upgrade error:', err)
+    return NextResponse.json({ error: err?.message || 'Erreur lors de l\'upgrade' }, { status: 500 })
+  }
 }
