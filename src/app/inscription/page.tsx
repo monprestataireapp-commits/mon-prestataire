@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { CATEGORIES } from '@/lib/categories'
@@ -14,15 +14,15 @@ const STEPS = ['Compte', 'Profil', 'Localisation', 'Livraison', 'Catégories', '
 
 export default function InscriptionPage() {
   const router = useRouter()
-    const searchParams = useSearchParams()
+  
 
     // Capturer le code de parrainage depuis l'URL
     useEffect(() => {
-          const ref = searchParams.get('ref')
+          const ref = new URLSearchParams(window.location.search).get('ref')
           if (ref) {
                   document.cookie = `ref=${ref}; path=/; max-age=2592000`
           }
-    }, [searchParams])
+    }, [])
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
