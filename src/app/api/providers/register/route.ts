@@ -68,6 +68,8 @@ export async function POST(req: NextRequest) {
             specialties: JSON.stringify(specialties || []),
             isPublished: false,
             subscriptionStatus: 'inactive',
+                        referralCode: slug,
+                        referredBy: req.cookies.get('ref')?.value || null,
           },
         },
       },
@@ -89,6 +91,15 @@ export async function POST(req: NextRequest) {
     const isFoundingMember = user.provider?.isFoundingMember || false
     sendWelcomeEmail(email, name || businessName, isFoundingMember).catch(() => {})
     sendAdminNewUserEmail('provider', name || businessName, email, `<strong>Ville :</strong> ${city || '—'}<br><strong>Activité :</strong> ${businessName}`).catch(() => {})
+
+          // Incrémenter le compteur du parrain
+        const refCode = req.cookies.get('ref')?.value
+        if (refCode) {
+                await prisma.provider.updateMany({
+                          where: { referralCode: refCode },
+                          data: { referralCount: { increment: 1 }, referralEarnings: { increment: 1 } },
+                })
+        }
 
     return NextResponse.json({ success: true, slug: user.provider?.slug })
   } catch (err) {
