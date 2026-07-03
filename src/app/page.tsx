@@ -110,6 +110,7 @@ export default async function HomePage() {
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-6 sm:gap-10 mt-12">
+                        <p className="text-white/30 text-xs">Plateforme lancée le 2 juillet 2026 — nos chiffres sont réels</p>
             {[
               { label: 'Prestataires', value: siteStats.totalProviders > 0 ? `${siteStats.totalProviders}` : '0', icon: Users },
               { label: 'Avis vérifiés', value: siteStats.totalReviews > 0 ? `${siteStats.totalReviews}` : '0', icon: Star },
