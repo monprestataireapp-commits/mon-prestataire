@@ -54,6 +54,7 @@ export default async function DashboardPage() {
 
   const isActive = provider.subscriptionStatus === 'active' || provider.subscriptionStatus === 'trialing'
   const isPremium = provider.subscriptionPlan === 'premium'
+  const maxPhotos = (provider as any).customPhotoLimit ?? (isPremium ? 9999 : 3)
 
   const [pendingReviews, devisCount] = await Promise.all([
     prisma.review.count({ where: { providerId: provider.id, isApproved: false } }),
@@ -216,12 +217,12 @@ export default async function DashboardPage() {
       <div className="bg-dark-card border border-dark-border rounded-2xl p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-cormorant text-xl font-semibold text-white">
-            Galerie photos <span className="text-white/30 text-sm font-dm font-normal">({provider.photos.length}/{isPremium ? '∞' : 3})</span>
+            Galerie photos <span className="text-white/30 text-sm font-dm font-normal">({provider.photos.length}/{isPremium ? '∞' : maxPhotos})</span>
           </h2>
         </div>
         <PhotoManager
           initialPhotos={provider.photos}
-          maxPhotos={isPremium ? 9999 : 3}
+          maxPhotos={maxPhotos}
           isPremium={isPremium}
         />
       </div>

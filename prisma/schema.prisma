@@ -122,6 +122,7 @@ model Provider {
   // Tarifs
   priceMin          Int?     // Prix minimum en euros
   priceMax          Int?     // Prix maximum en euros
+  customPhotoLimit  Int?     // Override manuel de la limite photos (admin)
 
   // Vérification
   verificationRequested Boolean @default(false)
