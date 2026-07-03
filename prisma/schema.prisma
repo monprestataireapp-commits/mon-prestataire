@@ -129,6 +129,12 @@ model Provider {
   profileViews      Int      @default(0)
   profileClicks     Int      @default(0)
 
+  // Parrainage (100 premiers)
+  referralCode       String?  @unique
+  referredBy         String?
+  referralCount      Int      @default(0)
+  referralEarnings   Float    @default(0)
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
