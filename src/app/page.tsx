@@ -111,9 +111,9 @@ export default async function HomePage() {
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-6 sm:gap-10 mt-12">
             {[
-              { label: 'Prestataires', value: siteStats.totalProviders > 10 ? `${siteStats.totalProviders}+` : '500+', icon: Users },
-              { label: 'Avis vérifiés', value: siteStats.totalReviews > 10 ? `${siteStats.totalReviews}+` : '2 400+', icon: Star },
-              { label: 'Prestataires vérifiés', value: siteStats.verifiedCount > 0 ? `${siteStats.verifiedCount}` : '100+', icon: Shield },
+              { label: 'Prestataires', value: siteStats.totalProviders > 0 ? `${siteStats.totalProviders}` : '0', icon: Users },
+              { label: 'Avis vérifiés', value: siteStats.totalReviews > 0 ? `${siteStats.totalReviews}` : '0', icon: Star },
+              { label: 'Prestataires vérifiés', value: siteStats.verifiedCount > 0 ? `${siteStats.verifiedCount}` : '0', icon: Shield },
             ].map(stat => (
               <div key={stat.label} className="text-center">
                 <p className="font-cormorant text-3xl font-bold text-gradient-rose-gold">{stat.value}</p>
