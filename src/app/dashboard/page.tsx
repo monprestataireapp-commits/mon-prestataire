@@ -141,6 +141,30 @@ export default async function DashboardPage() {
         verificationRequested={provider.verificationRequested}
       />
 
+      {/* Parrainage */}
+      {provider.referralCode && (
+              <div className="bg-dark-card border border-dark-border rounded-2xl p-5 mb-6">
+                        <div className="flex items-center gap-2 mb-4">
+                                    <Zap size={18} className="text-gold" />
+                                    <h2 className="font-cormorant text-xl font-semibold text-white">Parrainage</h2>h2>
+                        </div>div>
+                        <p className="text-white/50 text-sm mb-3">Partagez votre lien et gagnez 1€ par inscription !</p>p>
+                        <div className="bg-dark border border-dark-border rounded-xl p-3 mb-4 flex items-center justify-between">
+                                    <code className="text-gold text-sm">mon-prestataire.fr/inscription?ref={provider.referralCode}</code>code>
+                        </div>div>
+                        <div className="grid grid-cols-2 gap-4">
+                                    <div className="text-center">
+                                                  <p className="font-cormorant text-3xl font-bold text-white">{provider.referralCount}</p>p>
+                                                  <p className="text-white/40 text-xs">Filleuls</p>p>
+                                    </div>div>
+                                    <div className="text-center">
+                                                  <p className="font-cormorant text-3xl font-bold text-gold">{provider.referralEarnings}€</p>p>
+                                                  <p className="text-white/40 text-xs">Gains</p>p>
+                                    </div>div>
+                        </div>div>
+              </div>div>
+          )}</div>
+
       {/* Score de complétion du profil */}
       <ProfileCompletion provider={provider} />
 
