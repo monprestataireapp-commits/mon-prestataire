@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { geocodeCity } from '@/lib/geocode'
 
 function isAdmin(session: any) {
   return session?.user?.role === 'ADMIN' || session?.user?.email === process.env.ADMIN_EMAIL
@@ -65,6 +66,7 @@ export async function POST(req: NextRequest) {
             subscriptionEndsAt,
             isPublished: true,
             isVerified: false,
+            ...await geocodeCity(city, region).then(c => c ? { latitude: c.lat, longitude: c.lng } : {}),
             adminNotes: `Compte créé manuellement par admin — ${months} mois offerts jusqu'au ${subscriptionEndsAt.toLocaleDateString('fr-FR')}`,
           },
         },
