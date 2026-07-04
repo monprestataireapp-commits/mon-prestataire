@@ -7,7 +7,6 @@ export async function GET() {
   const providers = await prisma.provider.findMany({
     where: {
       isPublished: true,
-      subscriptionStatus: { in: ['active', 'trialing'] },
       latitude: { not: null },
       longitude: { not: null },
     },
