@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const {
       email, password, name, businessName, description,
-      city, department, departmentCode, region,
+      country, city, department, departmentCode, region,
       phone, phonePublic, instagramUrl, tiktokUrl, website,
       categories, specialties, yearsExperience,
       hasDelivery, deliveryZone, deliveryFee, hasHandDelivery,
@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
             department: department || '',
             departmentCode: departmentCode || '',
             region: region || '',
-            country: 'FR',
-            ...await geocodeCity(city, region).then(c => c ? { latitude: c.lat, longitude: c.lng } : {}),
+            country: country || 'FR',
+            ...await geocodeCity(city, region, country === 'FR' ? undefined : country).then(c => c ? { latitude: c.lat, longitude: c.lng } : {}),
             phone,
             phonePublic: phonePublic || false,
             instagramUrl,

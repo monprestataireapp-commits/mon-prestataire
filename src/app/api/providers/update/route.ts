@@ -19,7 +19,7 @@ export async function PATCH(req: NextRequest) {
 
   const stringFields = [
     'businessName', 'description', 'phone', 'instagramUrl', 'tiktokUrl', 'website',
-    'city', 'region', 'department', 'departmentCode',
+    'country', 'city', 'region', 'department', 'departmentCode',
     'responseTime', 'availabilityNotes', 'deliveryZone', 'deliveryFee',
   ]
   for (const f of stringFields) {
@@ -37,7 +37,8 @@ export async function PATCH(req: NextRequest) {
 
   // Regéocoder si la ville a changé
   if ('city' in body) {
-    const coords = await geocodeCity(body.city, body.region || provider.region)
+    const country = body.country || provider.country
+    const coords = await geocodeCity(body.city, body.region || provider.region, country === 'FR' ? undefined : country)
     if (coords) { data.latitude = coords.lat; data.longitude = coords.lng }
   }
 

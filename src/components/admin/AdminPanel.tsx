@@ -5,10 +5,11 @@ import Image from 'next/image'
 import { CheckCircle, XCircle, Eye, EyeOff, Shield, Users, Zap, Star, MessageSquare, Mail, Download, BarChart2, TrendingUp, Trash2, ExternalLink, UserPlus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getPhotoUrl } from '@/lib/photo'
+import { EUROPEAN_COUNTRIES, REGIONS_BY_COUNTRY } from '@/lib/regions-europe'
 
 type Tab = 'stats' | 'providers' | 'clients' | 'reviews' | 'newsletter'
 
-const EMPTY_FORM = { name: '', email: '', password: '', businessName: '', city: '', region: '', months: '6' }
+const EMPTY_FORM = { name: '', email: '', password: '', businessName: '', country: 'FR', city: '', region: '', months: '6' }
 
 export function AdminPanel() {
   const [tab, setTab] = useState<Tab>('stats')
@@ -624,6 +625,18 @@ export function AdminPanel() {
                 />
               </div>
 
+              <div>
+                <label className="text-xs text-white/40 mb-1 block">Pays *</label>
+                <select
+                  value={createForm.country}
+                  onChange={e => setCreateForm(f => ({ ...f, country: e.target.value, region: '' }))}
+                  className="input-dark text-sm bg-dark-card"
+                >
+                  {EUROPEAN_COUNTRIES.map(c => (
+                    <option key={c.code} value={c.code}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">Ville *</label>
@@ -636,12 +649,16 @@ export function AdminPanel() {
                 </div>
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">Région *</label>
-                  <input
+                  <select
                     value={createForm.region}
                     onChange={e => setCreateForm(f => ({ ...f, region: e.target.value }))}
-                    className="input-dark text-sm"
-                    placeholder="Île-de-France"
-                  />
+                    className="input-dark text-sm bg-dark-card"
+                  >
+                    <option value="">Sélectionner</option>
+                    {(REGIONS_BY_COUNTRY[createForm.country] || []).map(r => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

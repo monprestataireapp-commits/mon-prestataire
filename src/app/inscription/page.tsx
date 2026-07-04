@@ -7,6 +7,7 @@ import { signIn } from 'next-auth/react'
 import { CATEGORIES } from '@/lib/categories'
 import { SPECIALTIES } from '@/lib/specialties'
 import { DEPARTMENTS_FRANCE, REGIONS_FRANCE } from '@/lib/utils'
+import { EUROPEAN_COUNTRIES, REGIONS_BY_COUNTRY } from '@/lib/regions-europe'
 import { Check, ChevronRight, ChevronLeft, Zap, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -32,7 +33,7 @@ export default function InscriptionPage() {
     email: '', password: '', confirmPassword: '', name: '',
     businessName: '', description: '', phone: '', phonePublic: false, instagramUrl: '', tiktokUrl: '', website: '',
     yearsExperience: '',
-    city: '', region: '', department: '', departmentCode: '',
+    country: 'FR', city: '', region: '', department: '', departmentCode: '',
     hasDelivery: false, deliveryZone: '', deliveryFee: '', hasHandDelivery: false,
     priceMin: '', priceMax: '',
     categories: [] as string[],
@@ -224,28 +225,43 @@ export default function InscriptionPage() {
             <div className="space-y-4">
               <h2 className="font-cormorant text-2xl font-semibold text-white mb-4">Votre localisation</h2>
               <div>
-                <label className="text-xs text-white/50 mb-1 block">Ville *</label>
-                <input value={form.city} onChange={e => set('city', e.target.value)} className="input-dark" placeholder="Paris, Lyon, Marseille…" />
-              </div>
-              <div>
-                <label className="text-xs text-white/50 mb-1 block">Département</label>
-                <select value={form.departmentCode} onChange={e => {
-                  const dept = DEPARTMENTS_FRANCE.find(d => d.code === e.target.value)
-                  set('departmentCode', e.target.value)
-                  set('department', dept?.name || '')
-                  set('region', dept?.region || '')
+                <label className="text-xs text-white/50 mb-1 block">Pays *</label>
+                <select value={form.country} onChange={e => {
+                  set('country', e.target.value)
+                  set('region', '')
+                  set('department', '')
+                  set('departmentCode', '')
                 }} className="input-dark bg-dark-card">
-                  <option value="">Sélectionner un département</option>
-                  {DEPARTMENTS_FRANCE.map(d => (
-                    <option key={d.code} value={d.code}>{d.code} — {d.name}</option>
+                  {EUROPEAN_COUNTRIES.map(c => (
+                    <option key={c.code} value={c.code}>{c.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="text-xs text-white/50 mb-1 block">Région</label>
+                <label className="text-xs text-white/50 mb-1 block">Ville *</label>
+                <input value={form.city} onChange={e => set('city', e.target.value)} className="input-dark" placeholder="Paris, Lyon, Marseille…" />
+              </div>
+              {form.country === 'FR' && (
+                <div>
+                  <label className="text-xs text-white/50 mb-1 block">Département</label>
+                  <select value={form.departmentCode} onChange={e => {
+                    const dept = DEPARTMENTS_FRANCE.find(d => d.code === e.target.value)
+                    set('departmentCode', e.target.value)
+                    set('department', dept?.name || '')
+                    set('region', dept?.region || '')
+                  }} className="input-dark bg-dark-card">
+                    <option value="">Sélectionner un département</option>
+                    {DEPARTMENTS_FRANCE.map(d => (
+                      <option key={d.code} value={d.code}>{d.code} — {d.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div>
+                <label className="text-xs text-white/50 mb-1 block">Région *</label>
                 <select value={form.region} onChange={e => set('region', e.target.value)} className="input-dark bg-dark-card">
                   <option value="">Sélectionner une région</option>
-                  {REGIONS_FRANCE.map(r => <option key={r} value={r}>{r}</option>)}
+                  {(REGIONS_BY_COUNTRY[form.country] || []).map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>
             </div>

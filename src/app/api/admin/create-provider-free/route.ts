@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   if (!isAdmin(session)) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
 
   try {
-    const { name, email, password, businessName, city, region, months } = await req.json()
+    const { name, email, password, businessName, country, city, region, months } = await req.json()
 
     if (!name || !email || !password || !businessName || !city || !region || !months) {
       return NextResponse.json({ error: 'Tous les champs sont obligatoires' }, { status: 400 })
@@ -61,12 +61,13 @@ export async function POST(req: NextRequest) {
             city,
             region,
             department: region,
+            country: country || 'FR',
             subscriptionPlan: 'standard',
             subscriptionStatus: 'active',
             subscriptionEndsAt,
             isPublished: true,
             isVerified: false,
-            ...await geocodeCity(city, region).then(c => c ? { latitude: c.lat, longitude: c.lng } : {}),
+            ...await geocodeCity(city, region, country === 'FR' ? undefined : country).then(c => c ? { latitude: c.lat, longitude: c.lng } : {}),
             adminNotes: `Compte créé manuellement par admin — ${months} mois offerts jusqu'au ${subscriptionEndsAt.toLocaleDateString('fr-FR')}`,
           },
         },
