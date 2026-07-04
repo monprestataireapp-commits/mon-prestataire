@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   if (!isAdmin(session)) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
 
   try {
-    const { name, email, password, businessName, country, city, region, months } = await req.json()
+    const { name, email, password, businessName, country, city, region, months, categories } = await req.json()
 
     if (!name || !email || !password || !businessName || !city || !region || !months) {
       return NextResponse.json({ error: 'Tous les champs sont obligatoires' }, { status: 400 })
@@ -73,6 +73,18 @@ export async function POST(req: NextRequest) {
         },
       },
     })
+
+    if (Array.isArray(categories) && categories.length > 0) {
+      const provider = await prisma.provider.findUnique({ where: { userId: user.id } })
+      if (provider) {
+        for (const catSlug of categories) {
+          const cat = await prisma.category.findUnique({ where: { slug: catSlug } })
+          if (cat) {
+            await prisma.providerCategory.create({ data: { providerId: provider.id, categoryId: cat.id } })
+          }
+        }
+      }
+    }
 
     return NextResponse.json({ success: true, userId: user.id })
   } catch (err) {

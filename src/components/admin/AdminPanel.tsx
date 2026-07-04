@@ -6,10 +6,11 @@ import { CheckCircle, XCircle, Eye, EyeOff, Shield, Users, Zap, Star, MessageSqu
 import { cn } from '@/lib/utils'
 import { getPhotoUrl } from '@/lib/photo'
 import { EUROPEAN_COUNTRIES, REGIONS_BY_COUNTRY } from '@/lib/regions-europe'
+import { CATEGORIES } from '@/lib/categories'
 
 type Tab = 'stats' | 'providers' | 'clients' | 'reviews' | 'newsletter'
 
-const EMPTY_FORM = { name: '', email: '', password: '', businessName: '', country: 'FR', city: '', region: '', months: '6' }
+const EMPTY_FORM = { name: '', email: '', password: '', businessName: '', country: 'FR', city: '', region: '', months: '6', categories: [] as string[] }
 
 export function AdminPanel() {
   const [tab, setTab] = useState<Tab>('stats')
@@ -659,6 +660,32 @@ export function AdminPanel() {
                       <option key={r} value={r}>{r}</option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-white/40 mb-1 block">Catégories</label>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.map(cat => (
+                    <button
+                      key={cat.slug}
+                      type="button"
+                      onClick={() => setCreateForm(f => ({
+                        ...f,
+                        categories: f.categories.includes(cat.slug)
+                          ? f.categories.filter(c => c !== cat.slug)
+                          : [...f.categories, cat.slug]
+                      }))}
+                      className={cn(
+                        'text-xs px-2.5 py-1.5 rounded-lg border transition-colors',
+                        createForm.categories.includes(cat.slug)
+                          ? 'bg-rose border-rose text-white'
+                          : 'border-dark-border text-white/50 hover:border-rose/30'
+                      )}
+                    >
+                      {cat.emoji} {cat.name}
+                    </button>
+                  ))}
                 </div>
               </div>
 
