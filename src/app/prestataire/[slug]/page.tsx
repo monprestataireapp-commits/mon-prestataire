@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Image from 'next/image'
 import { Star, MapPin, Phone, CheckCircle, Truck, ArrowLeft, Calendar, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -68,6 +68,7 @@ async function getProvider(slug: string) {
 
 export default async function ProviderPage({ params }: Props) {
   const [provider, session] = await Promise.all([getProvider(params.slug), getServerSession(authOptions)])
+  if (!session?.user) redirect('/connexion')
   if (!provider) notFound()
   const isOwner = (session?.user as any)?.id === provider.userId
   if (!provider.isPublished && !isOwner) notFound()
