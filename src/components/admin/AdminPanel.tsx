@@ -648,7 +648,7 @@ export function AdminPanel() {
               <div>
                 <label className="text-xs text-white/40 mb-1 block">Durée gratuite</label>
                 <div className="flex gap-2">
-                  {(['3', '6', '12'] as const).map(m => (
+                  {(['3', '6', '12', '24'] as const).map(m => (
                     <button
                       key={m}
                       onClick={() => setCreateForm(f => ({ ...f, months: m }))}
@@ -659,7 +659,7 @@ export function AdminPanel() {
                           : 'border-dark-border text-white/50 hover:border-rose/30'
                       )}
                     >
-                      {m} mois
+                      {m === '24' ? '2 ans' : `${m} mois`}
                     </button>
                   ))}
                 </div>
@@ -681,7 +681,7 @@ export function AdminPanel() {
                 disabled={createLoading}
                 className="flex-1 py-2.5 rounded-xl bg-rose text-white text-sm font-medium hover:bg-rose/80 transition-colors disabled:opacity-50"
               >
-                {createLoading ? 'Création…' : `Créer — ${createForm.months} mois gratuits`}
+                {createLoading ? 'Création…' : `Créer — ${createForm.months === '24' ? '2 ans' : `${createForm.months} mois`} gratuits`}
               </button>
             </div>
           </div>
