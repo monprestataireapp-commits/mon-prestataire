@@ -187,18 +187,18 @@ export function AdminPanel() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total prestataires', value: stats.total, icon: Users, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-          { label: 'Abonnements actifs', value: stats.active, icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-400/10' },
-          { label: 'En attente de validation', value: stats.pending, icon: Eye, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
-          { label: 'Formule Premium', value: stats.premium, icon: Zap, color: 'text-gold', bg: 'bg-gold/10' },
+          { label: 'Total prestataires', value: stats.total, icon: Users, color: 'text-blue-400', bg: 'bg-blue-400/10', tab: 'providers' as Tab },
+          { label: 'Abonnements actifs', value: stats.active, icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-400/10', tab: 'providers' as Tab },
+          { label: 'En attente de validation', value: stats.pending, icon: Eye, color: 'text-yellow-400', bg: 'bg-yellow-400/10', tab: 'reviews' as Tab },
+          { label: 'Formule Premium', value: stats.premium, icon: Zap, color: 'text-gold', bg: 'bg-gold/10', tab: 'providers' as Tab },
         ].map(s => (
-          <div key={s.label} className="bg-dark-card border border-dark-border rounded-2xl p-4">
+          <button key={s.label} onClick={() => setTab(s.tab)} className="bg-dark-card border border-dark-border rounded-2xl p-4 text-left hover:border-rose/30 transition-colors cursor-pointer">
             <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
               <s.icon size={16} className={s.color} />
             </div>
             <p className="font-cormorant text-3xl font-bold text-white">{s.value}</p>
             <p className="text-white/40 text-xs mt-1">{s.label}</p>
-          </div>
+          </button>
         ))}
       </div>
 
