@@ -55,8 +55,8 @@ interface Props {
 export default function MapClient({ providers }: Props) {
   return (
     <MapContainer
-      center={[46.5, 2.5]}
-      zoom={6}
+      center={[48.5, 10]}
+      zoom={4}
       style={{ height: '600px', width: '100%', borderRadius: '16px' }}
       className="z-0"
     >
