@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Carnet {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  format          String           @default("blog")
+  titre           String
+  sousTitre       String
+  dateDebut       DateTime
+  dateFin         DateTime
+  villes          String
+  photoCouverture String?
+  publie          Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  etapes          Etape[]
+  pagesLivre      PageLivre[]
+  messages        MessageLivreOr[]
+}
+
+model PageLivre {
+  id       String @id @default(cuid())
+  carnetId String
+  ordre    Int
+  elements String @default("[]")
+  carnet   Carnet @relation(fields: [carnetId], references: [id], onDelete: Cascade)
+}
+
+model Etape {
+  id        String     @id @default(cuid())
+  carnetId  String
+  ordre     Int
+  jourLabel String
+  titre     String
+  texte     String
+  carnet    Carnet     @relation(fields: [carnetId], references: [id], onDelete: Cascade)
+  photos    Photo[]
+  reactions Reaction[]
+}
+
+model Photo {
+  id      String @id @default(cuid())
+  etapeId String
+  url     String
+  ordre   Int
+  etape   Etape  @relation(fields: [etapeId], references: [id], onDelete: Cascade)
+}
+
+model Reaction {
+  id             String @id @default(cuid())
+  etapeId        String @unique
+  compteurCoeurs Int    @default(0)
+  etape          Etape  @relation(fields: [etapeId], references: [id], onDelete: Cascade)
+}
+
+model MessageLivreOr {
+  id        String   @id @default(cuid())
+  carnetId  String
+  prenom    String
+  message   String
+  createdAt DateTime @default(now())
+  carnet    Carnet   @relation(fields: [carnetId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rose: #C8748A;
+  --gold: #C8A951;
+  --bg: #FFF8F9;
+  --dark: #2D1B25;
+  --grad: linear-gradient(135deg, #C8748A, #C8A951);
+  --shadow: 0 4px 24px rgba(200,116,138,0.12);
+  --radius: 14px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
+}
+
+h1, h2, h3 {
+  font-family: 'Syne', sans-serif;
+}
+
+.btn-grad {
+  background: var(--grad);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-grad:hover {
+  opacity: 0.9;
+}
