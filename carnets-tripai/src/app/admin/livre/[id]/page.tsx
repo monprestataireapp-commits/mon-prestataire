@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import ModerationLivreOr from "../../ModerationLivreOr";
 
 type Element = {
   id: string;
@@ -702,6 +703,8 @@ export default function EditLivre() {
           onDeletePage={() => deletePage(pages[activePage].id)}
         />
       )}
+
+      <ModerationLivreOr carnetId={carnet.id} />
     </div>
   );
 }

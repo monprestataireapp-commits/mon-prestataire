@@ -60,10 +60,19 @@ model Reaction {
 }
 
 model MessageLivreOr {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   carnetId  String
   prenom    String
   message   String
-  createdAt DateTime @default(now())
-  carnet    Carnet   @relation(fields: [carnetId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  carnet    Carnet         @relation(fields: [carnetId], references: [id], onDelete: Cascade)
+  photos    PhotoLivreOr[]
+}
+
+model PhotoLivreOr {
+  id        String         @id @default(cuid())
+  messageId String
+  url       String
+  approuve  Boolean        @default(false)
+  message   MessageLivreOr @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }

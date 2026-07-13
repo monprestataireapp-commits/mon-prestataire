@@ -17,6 +17,10 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
         include: { photos: { orderBy: { ordre: "asc" } } },
       },
       pagesLivre: { orderBy: { ordre: "asc" } },
+      messages: {
+        orderBy: { createdAt: "asc" },
+        include: { photos: true },
+      },
     },
   });
   if (!carnet) return NextResponse.json({ error: "Introuvable" }, { status: 404 });

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import ModerationLivreOr from "../../ModerationLivreOr";
 
 type Photo = { id: string; url: string; ordre: number };
 type Etape = {
@@ -446,6 +447,8 @@ export default function EditCarnet() {
             </div>
           ))}
       </div>
+
+      <ModerationLivreOr carnetId={carnet.id} />
     </div>
   );
 }

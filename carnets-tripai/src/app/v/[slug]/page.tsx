@@ -43,7 +43,10 @@ export default async function CarnetPublic({ params }: Props) {
         },
       },
       pagesLivre: { orderBy: { ordre: "asc" } },
-      messages: { orderBy: { createdAt: "asc" } },
+      messages: {
+        orderBy: { createdAt: "asc" },
+        include: { photos: { where: { approuve: true } } },
+      },
     },
   });
 
@@ -70,6 +73,7 @@ export default async function CarnetPublic({ params }: Props) {
     id: m.id,
     prenom: m.prenom,
     message: m.message,
+    photos: m.photos.map((p) => ({ id: p.id, url: p.url })),
   }));
 
   // ── Livre format ──
