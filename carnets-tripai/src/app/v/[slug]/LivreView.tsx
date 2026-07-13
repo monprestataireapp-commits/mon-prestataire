@@ -8,8 +8,11 @@ type Element = {
   type: "photo" | "text";
   url?: string;
   content?: string;
-  size: "small" | "medium" | "large" | "full";
+  size?: "small" | "medium" | "large" | "full";
   textSize?: "sm" | "md" | "lg" | "xl";
+  x?: number;
+  y?: number;
+  w?: number;
 };
 
 type PageData = { id: string; ordre: number; elements: string };
@@ -84,12 +87,50 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
   }, [goNext, goPrev]);
 
   function renderElements(elements: Element[]) {
+    const freeLayout =
+      elements.length > 0 &&
+      elements.every((el) => el.x != null && el.y != null && el.w != null);
+
+    if (freeLayout) {
+      return (
+        <div className="relative w-full h-full">
+          {elements.map((el) => (
+            <div
+              key={el.id}
+              style={{
+                position: "absolute",
+                left: `${el.x}%`,
+                top: `${el.y}%`,
+                width: `${el.w}%`,
+              }}
+            >
+              {el.type === "photo" ? (
+                <img
+                  src={el.url}
+                  alt=""
+                  className="w-full h-auto rounded-lg"
+                  style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.12)" }}
+                />
+              ) : (
+                <p
+                  className="text-[#5A4450] leading-relaxed whitespace-pre-wrap break-words"
+                  style={{ fontSize: TEXT_SIZE_MAP[el.textSize || "md"] }}
+                >
+                  {el.content}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-wrap gap-3 p-5 h-full content-start overflow-y-auto">
         {elements.map((el) => (
           <div
             key={el.id}
-            style={{ width: SIZE_MAP[el.size], flexShrink: 0 }}
+            style={{ width: SIZE_MAP[el.size || "medium"], flexShrink: 0 }}
           >
             {el.type === "photo" ? (
               <img
@@ -202,7 +243,7 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
   return (
     <div className="min-h-screen bg-[#2D1B25] flex flex-col items-center justify-center py-8 px-4">
       <style>{`
-        .book-container { perspective: 1800px; width: min(480px, 90vw); height: min(640px, 80vh); }
+        .book-container { perspective: 1800px; width: min(480px, 90vw, 60vh); aspect-ratio: 3 / 4; }
         .book-page {
           position: absolute; inset: 0;
           border-radius: 4px 12px 12px 4px; overflow: hidden;

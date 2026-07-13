@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tripai",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3456", "--no-clipboard", "."],
+      "port": 3456
+    },
+    {
+      "name": "carnets-tripai",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:\\Users\\leilo\\MonPrestataire\\carnets-tripai", "run", "dev", "--", "-p", "3457"],
+      "port": 3457
+    },
+    {
+      "name": "carnets",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:\\Users\\leilo\\MonPrestataire\\carnets-tripai", "run", "dev", "--", "-p", "3005"],
+      "port": 3005
+    },
+    {
+      "name": "ummah-connect",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:\\Users\\leilo\\ummah-connect", "run", "dev", "--", "-p", "3001"],
+      "port": 3001
+    }
+  ]
+}

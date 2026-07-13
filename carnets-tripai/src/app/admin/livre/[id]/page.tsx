@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 type Element = {
@@ -8,8 +8,11 @@ type Element = {
   type: "photo" | "text";
   url?: string;
   content?: string;
-  size: "small" | "medium" | "large" | "full";
+  size?: "small" | "medium" | "large" | "full";
   textSize?: "sm" | "md" | "lg" | "xl";
+  x?: number;
+  y?: number;
+  w?: number;
 };
 
 type PageLivre = {
@@ -32,13 +35,6 @@ type CarnetData = {
   pagesLivre: PageLivre[];
 };
 
-const SIZE_LABELS: Record<string, string> = {
-  small: "Petit",
-  medium: "Moyen",
-  large: "Grand",
-  full: "Plein",
-};
-
 const TEXT_SIZE_LABELS: Record<string, string> = {
   sm: "Petit",
   md: "Normal",
@@ -53,15 +49,421 @@ const TEXT_SIZE_CLASSES: Record<string, string> = {
   xl: "text-lg",
 };
 
-const SIZE_WIDTHS: Record<string, string> = {
-  small: "w-1/3",
-  medium: "w-1/2",
-  large: "w-3/4",
-  full: "w-full",
+const LEGACY_WIDTHS: Record<string, number> = {
+  small: 30,
+  medium: 45,
+  large: 70,
+  full: 90,
 };
 
 function genId() {
   return Math.random().toString(36).slice(2, 10);
+}
+
+function clamp(v: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, v));
+}
+
+function withLayout(elements: Element[]): Element[] {
+  let cursor = 0;
+  return elements.map((el) => {
+    if (el.x != null && el.y != null && el.w != null) return el;
+    const w = LEGACY_WIDTHS[el.size || "medium"] ?? 45;
+    const placed = {
+      ...el,
+      x: 5 + (cursor % 3) * 10,
+      y: 4 + cursor * 16,
+      w,
+    };
+    cursor++;
+    return placed;
+  });
+}
+
+function PageCanvas({
+  carnetId,
+  page,
+  onDeletePage,
+  pageLabel,
+}: {
+  carnetId: string;
+  page: PageLivre;
+  onDeletePage: () => void;
+  pageLabel: string;
+}) {
+  const [els, setEls] = useState<Element[]>(() =>
+    withLayout(JSON.parse(page.elements || "[]"))
+  );
+  const [uploading, setUploading] = useState(false);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const elsRef = useRef(els);
+  elsRef.current = els;
+  const dragRef = useRef<{
+    elId: string;
+    mode: "move" | "resize";
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+    origW: number;
+  } | null>(null);
+
+  const persist = useCallback(
+    async (elements: Element[]) => {
+      await fetch(`/api/carnets/${carnetId}/pages/${page.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ elements: JSON.stringify(elements) }),
+      });
+    },
+    [carnetId, page.id]
+  );
+
+  function apply(elements: Element[]) {
+    setEls(elements);
+    persist(elements);
+  }
+
+  function startDrag(
+    e: React.PointerEvent,
+    elId: string,
+    mode: "move" | "resize"
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+    beginDrag(elId, mode, e.clientX, e.clientY);
+  }
+
+  function beginDrag(
+    elId: string,
+    mode: "move" | "resize",
+    clientX: number,
+    clientY: number
+  ) {
+    const el = elsRef.current.find((x) => x.id === elId);
+    if (!el) return;
+
+    setEls((prev) => {
+      const me = prev.find((x) => x.id === elId);
+      if (!me) return prev;
+      return [...prev.filter((x) => x.id !== elId), me];
+    });
+
+    dragRef.current = {
+      elId,
+      mode,
+      startX: clientX,
+      startY: clientY,
+      origX: el.x!,
+      origY: el.y!,
+      origW: el.w!,
+    };
+    setDragId(elId);
+
+    const onMove = (ev: PointerEvent) => {
+      const d = dragRef.current;
+      const canvas = canvasRef.current;
+      if (!d || !canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const dx = ((ev.clientX - d.startX) / rect.width) * 100;
+      const dy = ((ev.clientY - d.startY) / rect.height) * 100;
+      setEls((prev) =>
+        prev.map((el2) => {
+          if (el2.id !== d.elId) return el2;
+          if (d.mode === "move") {
+            return {
+              ...el2,
+              x: clamp(d.origX + dx, 0, 100 - Math.min(el2.w ?? 45, 25)),
+              y: clamp(d.origY + dy, 0, 96),
+            };
+          }
+          return { ...el2, w: clamp(d.origW + dx, 10, 100) };
+        })
+      );
+    };
+
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      dragRef.current = null;
+      setDragId(null);
+      persist(elsRef.current);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  // Text blocks: press and move = drag the block; release without moving = edit
+  function textPointerDown(e: React.PointerEvent, elId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    let started = false;
+
+    const onMove = (ev: PointerEvent) => {
+      if (started) return;
+      if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > 5) {
+        started = true;
+        cleanup();
+        beginDrag(elId, "move", startX, startY);
+      }
+    };
+    const onUp = () => {
+      cleanup();
+      if (!started) {
+        setEditingId(elId);
+        setTimeout(() => {
+          const ta = document.querySelector(
+            `textarea[data-elid="${elId}"]`
+          ) as HTMLTextAreaElement | null;
+          if (ta) {
+            ta.focus();
+            ta.selectionStart = ta.value.length;
+          }
+        }, 0);
+      }
+    };
+    const cleanup = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  async function uploadPhotos(files: File[]) {
+    setUploading(true);
+    let current = elsRef.current;
+    for (const file of files) {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("type", "livre");
+      const r = await fetch("/api/upload", { method: "POST", body: fd });
+      if (r.ok) {
+        const data = await r.json();
+        const n = current.length;
+        current = [
+          ...current,
+          {
+            id: genId(),
+            type: "photo",
+            url: data.url,
+            x: 6 + (n % 4) * 8,
+            y: 6 + (n % 4) * 10,
+            w: 45,
+          },
+        ];
+      }
+    }
+    apply(current);
+    setUploading(false);
+  }
+
+  function addText() {
+    const n = els.length;
+    const newId = genId();
+    apply([
+      ...els,
+      {
+        id: newId,
+        type: "text",
+        content: "",
+        textSize: "md",
+        x: 6 + (n % 4) * 8,
+        y: 6 + (n % 4) * 10,
+        w: 60,
+      },
+    ]);
+    setEditingId(newId);
+    setTimeout(() => {
+      (document.querySelector(
+        `textarea[data-elid="${newId}"]`
+      ) as HTMLTextAreaElement | null)?.focus();
+    }, 0);
+  }
+
+  function updateElement(elId: string, update: Partial<Element>) {
+    apply(els.map((el) => (el.id === elId ? { ...el, ...update } : el)));
+  }
+
+  function removeElement(elId: string) {
+    apply(els.filter((el) => el.id !== elId));
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-xs font-semibold uppercase tracking-wider text-gold">
+          {pageLabel}
+        </span>
+        <button
+          onClick={onDeletePage}
+          className="text-xs px-2 py-1 rounded border border-red-200 text-red-500 hover:bg-red-50"
+        >
+          Supprimer la page
+        </button>
+      </div>
+
+      <p className="text-xs text-[#8A7080] mb-3">
+        Glissez les photos et les textes pour les placer où vous voulez. Un simple
+        clic sur un texte pour l&apos;éditer. Tirez la poignée ronde en bas à
+        droite d&apos;un élément pour changer sa taille.
+      </p>
+
+      {/* Free canvas — same 3:4 ratio as the public book page */}
+      <div
+        ref={canvasRef}
+        className="relative mx-auto rounded-xl overflow-hidden bg-[#FFF8F9] border-2 border-dashed border-rose/20 select-none"
+        style={{ width: "min(480px, 100%)", aspectRatio: "3 / 4" }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          const files = Array.from(e.dataTransfer.files).filter((f) =>
+            f.type.startsWith("image/")
+          );
+          if (files.length) uploadPhotos(files);
+        }}
+      >
+        {els.length === 0 && (
+          <p className="absolute inset-0 flex items-center justify-center text-[#8A7080] text-sm px-8 text-center">
+            Page vide — ajoutez des photos ou du texte ci-dessous, puis
+            glissez-les où vous voulez
+          </p>
+        )}
+
+        {els.map((el) => (
+          <div
+            key={el.id}
+            className={`absolute group ${
+              dragId === el.id ? "ring-2 ring-rose z-30" : "hover:ring-1 hover:ring-rose/40"
+            } rounded-lg`}
+            style={{
+              left: `${el.x}%`,
+              top: `${el.y}%`,
+              width: `${el.w}%`,
+              touchAction: "none",
+            }}
+          >
+            {/* Controls */}
+            <div
+              className={`absolute -top-3 right-0 z-20 flex gap-1 transition ${
+                dragId === el.id ? "opacity-0" : "opacity-0 group-hover:opacity-100"
+              }`}
+            >
+              {el.type === "text" && (
+                <select
+                  value={el.textSize || "md"}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onChange={(e) =>
+                    updateElement(el.id, {
+                      textSize: e.target.value as Element["textSize"],
+                    })
+                  }
+                  className="text-[10px] bg-white shadow rounded px-1 outline-none"
+                >
+                  {Object.entries(TEXT_SIZE_LABELS).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={() => removeElement(el.id)}
+                className="w-5 h-5 bg-red-500 text-white shadow rounded text-[10px]"
+              >
+                ✕
+              </button>
+            </div>
+
+            {el.type === "photo" ? (
+              <img
+                src={el.url}
+                alt=""
+                draggable={false}
+                onPointerDown={(e) => startDrag(e, el.id, "move")}
+                className="w-full h-auto rounded-lg shadow-md cursor-move"
+              />
+            ) : (
+              <div
+                className={`relative rounded-lg ${
+                  editingId === el.id
+                    ? "bg-white border border-rose"
+                    : "bg-white/60 border border-rose/15"
+                }`}
+              >
+                <textarea
+                  data-elid={el.id}
+                  defaultValue={el.content}
+                  onBlur={(e) => {
+                    setEditingId(null);
+                    updateElement(el.id, { content: e.target.value });
+                  }}
+                  onInput={(e) => {
+                    const t = e.currentTarget;
+                    t.style.height = "auto";
+                    t.style.height = t.scrollHeight + "px";
+                  }}
+                  spellCheck={true}
+                  lang="fr"
+                  placeholder="Votre texte ici…"
+                  className={`w-full bg-transparent p-2 outline-none resize-none overflow-hidden ${
+                    TEXT_SIZE_CLASSES[el.textSize || "md"]
+                  } text-[#5A4450] leading-relaxed`}
+                  rows={2}
+                />
+                {editingId !== el.id && (
+                  <div
+                    onPointerDown={(e) => textPointerDown(e, el.id)}
+                    className="absolute inset-0 cursor-move rounded-lg"
+                    title="Glisser pour déplacer · cliquer pour éditer"
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Resize handle */}
+            <div
+              onPointerDown={(e) => startDrag(e, el.id, "resize")}
+              className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border border-rose rounded-full shadow cursor-ew-resize transition ${
+                dragId === el.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              }`}
+              title="Redimensionner"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Add elements */}
+      <div className="flex gap-2 mt-4">
+        <label className="cursor-pointer inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border border-dashed border-rose/30 text-rose hover:bg-rose/5 transition">
+          {uploading ? "Envoi…" : "📷 Ajouter une photo"}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              if (files.length) uploadPhotos(files);
+              e.target.value = "";
+            }}
+          />
+        </label>
+        <button
+          onClick={addText}
+          className="text-sm px-3 py-1.5 rounded-lg border border-dashed border-gold/30 text-gold hover:bg-gold/5 transition"
+        >
+          ✏️ Ajouter du texte
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function EditLivre() {
@@ -102,71 +504,11 @@ export default function EditLivre() {
     await load();
   }
 
-  async function savePage(pageId: string, elements: Element[]) {
-    await fetch(`/api/carnets/${id}/pages/${pageId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ elements: JSON.stringify(elements) }),
-    });
-    await load();
-  }
-
   async function deletePage(pageId: string) {
     if (!confirm("Supprimer cette page ?")) return;
     await fetch(`/api/carnets/${id}/pages/${pageId}`, { method: "DELETE" });
     await load();
     setActivePage((p) => Math.max(0, p - 1));
-  }
-
-  async function uploadPhoto(pageId: string, file: File, elements: Element[]) {
-    setUploading(pageId);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", "livre");
-    const r = await fetch("/api/upload", { method: "POST", body: formData });
-    if (r.ok) {
-      const data = await r.json();
-      const newEl: Element = {
-        id: genId(),
-        type: "photo",
-        url: data.url,
-        size: "medium",
-      };
-      await savePage(pageId, [...elements, newEl]);
-    }
-    setUploading(null);
-  }
-
-  function addText(pageId: string, elements: Element[]) {
-    const newEl: Element = {
-      id: genId(),
-      type: "text",
-      content: "",
-      size: "full",
-      textSize: "md",
-    };
-    savePage(pageId, [...elements, newEl]);
-  }
-
-  function updateElement(pageId: string, elements: Element[], elId: string, update: Partial<Element>) {
-    const updated = elements.map((el) =>
-      el.id === elId ? { ...el, ...update } : el
-    );
-    savePage(pageId, updated);
-  }
-
-  function removeElement(pageId: string, elements: Element[], elId: string) {
-    savePage(pageId, elements.filter((el) => el.id !== elId));
-  }
-
-  function moveElement(pageId: string, elements: Element[], elId: string, dir: "up" | "down") {
-    const idx = elements.findIndex((el) => el.id === elId);
-    if (idx < 0) return;
-    const newIdx = dir === "up" ? idx - 1 : idx + 1;
-    if (newIdx < 0 || newIdx >= elements.length) return;
-    const copy = [...elements];
-    [copy[idx], copy[newIdx]] = [copy[newIdx], copy[idx]];
-    savePage(pageId, copy);
   }
 
   async function saveAll() {
@@ -351,157 +693,15 @@ export default function EditLivre() {
       </div>
 
       {/* Active page editor */}
-      {pages.length > 0 && pages[activePage] && (() => {
-        const page = pages[activePage];
-        const elements: Element[] = JSON.parse(page.elements || "[]");
-
-        return (
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gold">
-                Page {activePage + 1}
-              </span>
-              <button
-                onClick={() => deletePage(page.id)}
-                className="text-xs px-2 py-1 rounded border border-red-200 text-red-500 hover:bg-red-50"
-              >
-                Supprimer la page
-              </button>
-            </div>
-
-            {/* Preview area */}
-            <div className="border-2 border-dashed border-rose/20 rounded-xl p-4 mb-4 min-h-[300px] bg-[#FFF8F9]">
-              {elements.length === 0 && (
-                <p className="text-center text-[#8A7080] text-sm py-12">
-                  Page vide — ajoutez des photos ou du texte ci-dessous
-                </p>
-              )}
-              <div className="flex flex-wrap gap-3">
-                {elements.map((el, idx) => (
-                  <div
-                    key={el.id}
-                    className={`relative group ${SIZE_WIDTHS[el.size]} shrink-0`}
-                    style={{ maxWidth: el.size === "full" ? "100%" : undefined }}
-                  >
-                    {/* Controls overlay */}
-                    <div className="absolute -top-2 right-0 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                      <button
-                        onClick={() => moveElement(page.id, elements, el.id, "up")}
-                        disabled={idx === 0}
-                        className="w-5 h-5 bg-white shadow rounded text-[10px] disabled:opacity-30"
-                      >
-                        ←
-                      </button>
-                      <button
-                        onClick={() => moveElement(page.id, elements, el.id, "down")}
-                        disabled={idx === elements.length - 1}
-                        className="w-5 h-5 bg-white shadow rounded text-[10px] disabled:opacity-30"
-                      >
-                        →
-                      </button>
-                      {/* Size selector */}
-                      <select
-                        value={el.size}
-                        onChange={(e) =>
-                          updateElement(page.id, elements, el.id, {
-                            size: e.target.value as Element["size"],
-                          })
-                        }
-                        className="text-[10px] bg-white shadow rounded px-1 outline-none"
-                      >
-                        {Object.entries(SIZE_LABELS).map(([k, v]) => (
-                          <option key={k} value={k}>{v}</option>
-                        ))}
-                      </select>
-                      {el.type === "text" && (
-                        <select
-                          value={el.textSize || "md"}
-                          onChange={(e) =>
-                            updateElement(page.id, elements, el.id, {
-                              textSize: e.target.value as Element["textSize"],
-                            })
-                          }
-                          className="text-[10px] bg-white shadow rounded px-1 outline-none"
-                        >
-                          {Object.entries(TEXT_SIZE_LABELS).map(([k, v]) => (
-                            <option key={k} value={k}>{v}</option>
-                          ))}
-                        </select>
-                      )}
-                      <button
-                        onClick={() => removeElement(page.id, elements, el.id)}
-                        className="w-5 h-5 bg-red-500 text-white shadow rounded text-[10px]"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    {el.type === "photo" ? (
-                      <img
-                        src={el.url}
-                        alt=""
-                        className="w-full rounded-lg object-cover"
-                        style={{
-                          height: el.size === "small" ? "120px" : el.size === "medium" ? "180px" : el.size === "large" ? "240px" : "320px",
-                        }}
-                      />
-                    ) : (
-                      <textarea
-                        defaultValue={el.content}
-                        onBlur={(e) =>
-                          updateElement(page.id, elements, el.id, {
-                            content: e.target.value,
-                          })
-                        }
-                        spellCheck={true}
-                        lang="fr"
-                        placeholder="Votre texte ici…"
-                        className={`w-full bg-transparent border border-rose/15 rounded-lg p-3 outline-none focus:border-rose resize-y ${
-                          TEXT_SIZE_CLASSES[el.textSize || "md"]
-                        } text-[#5A4450] leading-relaxed`}
-                        rows={2}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Add elements */}
-            <div className="flex gap-2">
-              <label
-                className="cursor-pointer inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border border-dashed border-rose/30 text-rose hover:bg-rose/5 transition"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  Array.from(e.dataTransfer.files).forEach((f) =>
-                    uploadPhoto(page.id, f, elements)
-                  );
-                }}
-              >
-                {uploading === page.id ? "Envoi…" : "📷 Ajouter une photo"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={(e) => {
-                    Array.from(e.target.files || []).forEach((f) =>
-                      uploadPhoto(page.id, f, elements)
-                    );
-                  }}
-                />
-              </label>
-              <button
-                onClick={() => addText(page.id, elements)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-dashed border-gold/30 text-gold hover:bg-gold/5 transition"
-              >
-                ✏️ Ajouter du texte
-              </button>
-            </div>
-          </div>
-        );
-      })()}
+      {pages.length > 0 && pages[activePage] && (
+        <PageCanvas
+          key={pages[activePage].id}
+          carnetId={carnet.id}
+          page={pages[activePage]}
+          pageLabel={`Page ${activePage + 1}`}
+          onDeletePage={() => deletePage(pages[activePage].id)}
+        />
+      )}
     </div>
   );
 }

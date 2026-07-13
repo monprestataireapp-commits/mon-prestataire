@@ -15,9 +15,12 @@ export async function POST(req: NextRequest) {
 
   let url: string;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL) {
     const { put } = await import("@vercel/blob");
-    const blob = await put(file.name, file, { access: "public" });
+    const blob = await put(file.name, file, {
+      access: "public",
+      addRandomSuffix: true,
+    });
     url = blob.url;
   } else {
     const bytes = await file.arrayBuffer();
