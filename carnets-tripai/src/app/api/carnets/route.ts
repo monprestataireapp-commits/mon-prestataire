@@ -23,6 +23,7 @@ export async function POST(req: Request) {
   const carnet = await prisma.carnet.create({
     data: {
       slug: nanoid(8),
+      cleModeration: nanoid(16),
       format,
       titre: "",
       sousTitre: "",

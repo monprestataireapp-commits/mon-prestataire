@@ -10,6 +10,7 @@ datasource db {
 model Carnet {
   id              String           @id @default(cuid())
   slug            String           @unique
+  cleModeration   String?          @unique
   format          String           @default("blog")
   titre           String
   sousTitre       String

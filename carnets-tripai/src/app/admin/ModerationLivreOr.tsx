@@ -7,14 +7,26 @@ type MsgLO = { id: string; prenom: string; message: string; photos: PhotoLO[] };
 
 export default function ModerationLivreOr({ carnetId }: { carnetId: string }) {
   const [messages, setMessages] = useState<MsgLO[]>([]);
+  const [cleModeration, setCleModeration] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const load = useCallback(async () => {
     const r = await fetch(`/api/carnets/${carnetId}`);
     if (r.ok) {
       const data = await r.json();
       setMessages(data.messages || []);
+      setCleModeration(data.cleModeration || null);
     }
   }, [carnetId]);
+
+  function copyClientLink() {
+    if (!cleModeration) return;
+    navigator.clipboard.writeText(
+      `${window.location.origin}/moderation/${cleModeration}`
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   useEffect(() => {
     load();
@@ -31,8 +43,6 @@ export default function ModerationLivreOr({ carnetId }: { carnetId: string }) {
     await load();
   }
 
-  if (messages.length === 0) return null;
-
   const enAttente = messages.reduce(
     (n, m) => n + m.photos.filter((p) => !p.approuve).length,
     0
@@ -40,7 +50,7 @@ export default function ModerationLivreOr({ carnetId }: { carnetId: string }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 mt-6">
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-2 flex-wrap">
         <h2 className="font-bold text-lg">Livre d&apos;or</h2>
         <span className="text-xs text-[#8A7080]">
           {messages.length} message{messages.length > 1 ? "s" : ""}
@@ -50,7 +60,23 @@ export default function ModerationLivreOr({ carnetId }: { carnetId: string }) {
             {enAttente} photo{enAttente > 1 ? "s" : ""} en attente
           </span>
         )}
+        {cleModeration && (
+          <button
+            onClick={copyClientLink}
+            className="text-xs px-3 py-1.5 rounded-lg border border-rose/20 text-rose hover:bg-rose/5 transition ml-auto"
+          >
+            {copied ? "✓ Copié !" : "Copier le lien de validation client"}
+          </button>
+        )}
       </div>
+      <p className="text-xs text-[#8A7080] mb-4">
+        C&apos;est votre client qui valide les photos de ses invités : envoyez-lui
+        le lien de validation avec le lien du carnet.
+      </p>
+
+      {messages.length === 0 && (
+        <p className="text-sm text-[#8A7080]">Aucun message pour le moment.</p>
+      )}
 
       <div className="space-y-3">
         {messages.map((m) => (
