@@ -41,3 +41,14 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
   const carnet = await prisma.carnet.update({ where: { id }, data: update });
   return NextResponse.json(carnet);
 }
+
+export async function DELETE(_req: NextRequest, { params }: Ctx) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+  const { id } = params;
+  const carnet = await prisma.carnet.findUnique({ where: { id } });
+  if (!carnet) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
+  await prisma.carnet.delete({ where: { id } });
+  return NextResponse.json({ ok: true });
+}

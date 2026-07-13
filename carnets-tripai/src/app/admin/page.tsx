@@ -69,6 +69,18 @@ export default function AdminPage() {
     setTimeout(() => setCopied(null), 2000);
   }
 
+  async function deleteCarnet(c: Carnet) {
+    const nom = c.titre || "Sans titre";
+    if (
+      !confirm(
+        `Supprimer définitivement « ${nom} » ?\n\nToutes ses pages, photos, cœurs et messages du livre d'or seront perdus. Cette action est irréversible.`
+      )
+    )
+      return;
+    const r = await fetch(`/api/carnets/${c.id}`, { method: "DELETE" });
+    if (r.ok) loadCarnets();
+  }
+
   if (authenticated === null)
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -145,6 +157,7 @@ export default function AdminPage() {
                 copied={copied}
                 onCopy={copyLink}
                 onEdit={() => router.push(`/admin/carnet/${c.id}`)}
+                onDelete={() => deleteCarnet(c)}
               />
             ))}
           </div>
@@ -165,6 +178,7 @@ export default function AdminPage() {
                 copied={copied}
                 onCopy={copyLink}
                 onEdit={() => router.push(`/admin/livre/${c.id}`)}
+                onDelete={() => deleteCarnet(c)}
               />
             ))}
           </div>
@@ -189,6 +203,7 @@ function CarnetCard({
   copied,
   onCopy,
   onEdit,
+  onDelete,
 }: {
   carnet: {
     id: string;
@@ -202,6 +217,7 @@ function CarnetCard({
   copied: string | null;
   onCopy: (slug: string) => void;
   onEdit: () => void;
+  onDelete: () => void;
 }) {
   const isLivre = c.format === "livre";
   const count = isLivre ? c._count.pagesLivre : c._count.etapes;
@@ -257,6 +273,13 @@ function CarnetCard({
           className="text-sm px-4 py-2 rounded-lg bg-dark text-white hover:opacity-90 transition"
         >
           Modifier
+        </button>
+        <button
+          onClick={onDelete}
+          title="Supprimer ce carnet"
+          className="text-sm px-3 py-2 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition"
+        >
+          🗑
         </button>
       </div>
     </div>
