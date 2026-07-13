@@ -575,7 +575,7 @@ export function AdminPanel() {
       {/* Modal création compte gratuit */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-dark-card border border-dark-border rounded-2xl w-full max-w-md p-6">
+          <div className="bg-dark-card border border-dark-border rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-cormorant text-2xl font-bold text-white">Créer un compte prestataire gratuit</h2>
               <button onClick={() => setShowCreateModal(false)} className="text-white/40 hover:text-white transition-colors">
