@@ -203,7 +203,7 @@ export default async function CarnetPublic({ params }: Props) {
           {carnet.sousTitre}. Envie de raconter votre voyage à vos proches ?
         </p>
         <a
-          href="https://tripai-leila.netlify.app"
+          href="https://tripai-phi.vercel.app"
           className="inline-block btn-grad rounded-full px-7 py-3 text-sm"
         >
           Commander mon carnet

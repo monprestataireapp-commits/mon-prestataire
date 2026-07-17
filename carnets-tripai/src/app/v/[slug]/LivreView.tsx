@@ -230,7 +230,7 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
               Ce carnet a été composé avec amour à partir des photos et souvenirs de {carnet.sousTitre}.
             </p>
             <a
-              href="https://tripai-leila.netlify.app"
+              href="https://tripai-phi.vercel.app"
               className="mt-3 inline-block text-xs px-5 py-2 rounded-full border border-[#C8748A]/40 text-[#C8748A] hover:bg-[#C8748A]/10 transition"
             >
               Commander mon carnet

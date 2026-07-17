@@ -15,7 +15,7 @@ export default function Home() {
       </p>
       <div className="flex gap-4 flex-wrap justify-center">
         <a
-          href="https://tripai-leila.netlify.app"
+          href="https://tripai-phi.vercel.app"
           className="btn-grad rounded-full px-8 py-3 text-sm"
         >
           Découvrir TripAI

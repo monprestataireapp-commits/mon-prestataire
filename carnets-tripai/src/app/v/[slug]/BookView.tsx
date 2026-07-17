@@ -227,7 +227,7 @@ export default function BookView({ carnet, dateDebut, dateFin, totalPhotos, mess
               Envie de raconter votre voyage ?
             </p>
             <a
-              href="https://tripai-leila.netlify.app"
+              href="https://tripai-phi.vercel.app"
               className="mt-3 inline-block text-xs px-5 py-2 rounded-full border border-[#C8748A]/40 text-[#C8748A] hover:bg-[#C8748A]/10 transition"
             >
               Commander mon carnet
