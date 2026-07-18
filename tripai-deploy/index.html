@@ -5903,16 +5903,6 @@
               </select>
             </div>
             <div class="field">
-              <label>Durée de vol maximum</label>
-              <select id="p-flight">
-                <option>Peu importe</option>
-                <option>Moins de 3h</option>
-                <option>3h – 6h</option>
-                <option>6h – 10h</option>
-                <option>Plus de 10h OK</option>
-              </select>
-            </div>
-            <div class="field">
               <label>Niveau de confort</label>
               <select id="p-comfort">
                 <option>Économique (petit budget)</option>
@@ -6688,7 +6678,6 @@ async function submitPaid(e) {
     Destination: dest,
     Dates: (date1 && date2) ? date1 + ' → ' + date2 : '—',
     Voyageurs: tCount + '\n' + collectTravelers(),
-    'Budget vol': val('p-flight'),
     'Budget logement': val('p-lodging'),
     'Budget global': val('p-budget'),
     Confort: val('p-comfort'),
@@ -8984,7 +8973,7 @@ document.addEventListener('keydown', e => {
 });
 
 // ── FORM AUTO-SAVE ──────────────────────────────────────────────
-const SAVE_FIELDS = ['p-date1','p-date2','p-depart','p-budget','p-dest','p-lodging','p-flight','p-comfort','p-notes','p-email','f-depart','f-dest'];
+const SAVE_FIELDS = ['p-date1','p-date2','p-depart','p-budget','p-dest','p-lodging','p-comfort','p-notes','p-email','f-depart','f-dest'];
 let saveTimeout = null;
 
 function saveFormData() {
