@@ -6386,6 +6386,27 @@
 // ── STATE ──────────────────────────────────────────────────────
 let selectedFormula = null;
 let travelerCount = 0;
+
+// ── AFFILIATION ────────────────────────────────────────────────
+// Renseigner chaque identifiant au fur et à mesure des inscriptions aux
+// programmes partenaires. Champ vide = lien direct (aucune commission).
+const AFFILIATES = {
+  bookingAid: '',            // Booking.com Partner Programme → param « aid »
+  gygPartnerId: '',          // GetYourGuide Partner → param « partner_id »
+  kiwiAffilid: '',           // Kiwi.com (via Travelpayouts) → param « affilid »
+  hostelworldSource: '',     // Hostelworld → param « source »
+  skyscannerAssociateId: '', // Skyscanner Partners → param « associateid »
+  expediaAffcid: '',         // Expedia (via Partnerize) → param « affcid »
+  tripComAllianceId: '',     // Trip.com Alliance → param « Allianceid »
+  tripComSid: '',            //   + param « SID » (va avec Allianceid)
+  rentalcarsAffiliateCode: '', // Rentalcars → param « affiliateCode »
+};
+
+// Ajoute le paramètre d'affiliation à une URL si l'identifiant est renseigné
+function aff(url, param, value) {
+  if (!value) return url;
+  return url + (url.includes('?') ? '&' : '?') + param + '=' + encodeURIComponent(value);
+}
 const PREFS = ['🏖️ Plage','🎉 Fête','😌 Détente','🏛️ Culture','🌿 Nature','🍴 Gastro','🛍️ Shopping','⚽ Sports'];
 
 const FORMULAS = {
@@ -6467,39 +6488,39 @@ function showAffiliates(e) {
 
   const flightLinks = [
     { icon: '✈️', name: 'Skyscanner', desc: 'Comparateur #1 mondial',
-      url: `https://www.skyscanner.fr/transport/vols/${departEnc}/${destEnc}/${date1}/${date2}/?adults=${adults}&children=${children}&infants=${infants}` },
+      url: aff(`https://www.skyscanner.fr/transport/vols/${departEnc}/${destEnc}/${date1}/${date2}/?adults=${adults}&children=${children}&infants=${infants}`, 'associateid', AFFILIATES.skyscannerAssociateId) },
     { icon: '🔍', name: 'Google Flights', desc: 'Le moteur de Google',
       url: `https://www.google.com/travel/flights?q=Flights+from+${departEnc}+to+${destEnc}+on+${date1}+return+${date2}&curr=EUR` },
     { icon: '🧳', name: 'Kayak', desc: 'Vols au meilleur prix',
       url: `https://www.kayak.fr/flights/${departEnc}-${destEnc}/${date1}/${date2}/${adults}adults?sort=price_a` },
     { icon: '💺', name: 'Kiwi.com', desc: 'Vols low-cost & combinés',
-      url: `https://www.kiwi.com/fr/search/results/${departEnc}/${destEnc}/${date1}/${date2}/${adults}adults/${children}children` },
+      url: aff(`https://www.kiwi.com/fr/search/results/${departEnc}/${destEnc}/${date1}/${date2}/${adults}adults/${children}children`, 'affilid', AFFILIATES.kiwiAffilid) },
     { icon: '🌐', name: 'Momondo', desc: 'Tarifs cachés',
       url: `https://www.momondo.fr/flight-search/${departEnc}-${destEnc}/${date1}/${date2}/${adults}adults?sort=price_a` },
     { icon: '🛫', name: 'Trip.com', desc: 'Vols internationaux',
-      url: `https://www.trip.com/flights/${departEnc}-to-${destEnc}/tickets-${date1}?adult=${adults}&child=${children}` }
+      url: aff(aff(`https://www.trip.com/flights/${departEnc}-to-${destEnc}/tickets-${date1}?adult=${adults}&child=${children}`, 'Allianceid', AFFILIATES.tripComAllianceId), 'SID', AFFILIATES.tripComSid) }
   ];
 
   const hotelLinks = [
     { icon: '🏨', name: 'Booking.com', desc: 'Hôtels & résidences',
-      url: `https://www.booking.com/searchresults.html?ss=${destEnc}&checkin=${date1}&checkout=${date2}&group_adults=${adults}&group_children=${children}&no_rooms=1` },
+      url: aff(`https://www.booking.com/searchresults.html?ss=${destEnc}&checkin=${date1}&checkout=${date2}&group_adults=${adults}&group_children=${children}&no_rooms=1`, 'aid', AFFILIATES.bookingAid) },
     { icon: '🏠', name: 'Airbnb', desc: 'Logements uniques',
       url: `https://www.airbnb.fr/s/${destEnc}/homes?checkin=${date1}&checkout=${date2}&adults=${adults}&children=${children}&infants=${infants}` },
     { icon: '⭐', name: 'Hotels.com', desc: 'Cumul de nuits gratuites',
       url: `https://fr.hotels.com/search.do?q-destination=${destEnc}&q-check-in=${date1}&q-check-out=${date2}&q-rooms=1&q-room-0-adults=${adults}&q-room-0-children=${children}` },
     { icon: '🏢', name: 'Expedia', desc: 'Packs vol + hôtel',
-      url: `https://www.expedia.fr/Hotel-Search?destination=${destEnc}&startDate=${date1}&endDate=${date2}&rooms=1&adults=${adults}&children=${children}` },
+      url: aff(`https://www.expedia.fr/Hotel-Search?destination=${destEnc}&startDate=${date1}&endDate=${date2}&rooms=1&adults=${adults}&children=${children}`, 'affcid', AFFILIATES.expediaAffcid) },
     { icon: '🏡', name: 'Vrbo', desc: 'Maisons & villas',
       url: `https://www.vrbo.com/search?destination=${destEnc}&startDate=${date1}&endDate=${date2}&adults=${adults}` },
     { icon: '🛏️', name: 'Hostelworld', desc: 'Auberges de jeunesse',
-      url: `https://www.hostelworld.com/s?q=${destEnc}&dateFrom=${date1}&dateTo=${date2}&guests=${adults}` }
+      url: aff(`https://www.hostelworld.com/s?q=${destEnc}&dateFrom=${date1}&dateTo=${date2}&guests=${adults}`, 'source', AFFILIATES.hostelworldSource) }
   ];
 
   const extraLinks = [
     { icon: '🎟️', name: 'GetYourGuide', desc: 'Activités & excursions',
-      url: `https://www.getyourguide.fr/s/?q=${destEnc}&date_from=${date1}&date_to=${date2}` },
+      url: aff(`https://www.getyourguide.fr/s/?q=${destEnc}&date_from=${date1}&date_to=${date2}`, 'partner_id', AFFILIATES.gygPartnerId) },
     { icon: '🚗', name: 'Rentalcars', desc: 'Location de voiture',
-      url: `https://www.rentalcars.com/fr/search-results/?location=${destEnc}&puDate=${date1}&doDate=${date2}` },
+      url: aff(`https://www.rentalcars.com/fr/search-results/?location=${destEnc}&puDate=${date1}&doDate=${date2}`, 'affiliateCode', AFFILIATES.rentalcarsAffiliateCode) },
     { icon: '🛡️', name: 'Chapka', desc: 'Assurance voyage',
       url: 'https://www.chapkadirecte.com/' }
   ];
