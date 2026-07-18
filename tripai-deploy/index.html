@@ -4,6 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TripAI — Votre voyage, pensé pour vous</title>
+<meta name="description" content="Recherchez vols et hôtels gratuitement, ou recevez un itinéraire de voyage sur mesure créé à la main dès 4,99 €. Et racontez vos voyages avec nos carnets à partager dès 9,99 €.">
+<link rel="canonical" href="https://tripai-phi.vercel.app/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TripAI">
+<meta property="og:title" content="TripAI — Votre voyage, pensé pour vous">
+<meta property="og:description" content="Itinéraires de voyage sur mesure dès 4,99 € et carnets de voyage à partager dès 9,99 €. Par LeilaTripRadar.">
+<meta property="og:url" content="https://tripai-phi.vercel.app/">
+<meta property="og:image" content="https://tripai-phi.vercel.app/og-image.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TripAI — Votre voyage, pensé pour vous">
+<meta name="twitter:description" content="Itinéraires sur mesure dès 4,99 € et carnets de voyage à partager dès 9,99 €.">
+<meta name="twitter:image" content="https://tripai-phi.vercel.app/og-image.png">
+<script defer src="/_vercel/insights/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -5390,7 +5405,7 @@
     <span class="nav-by">by LeilaTripRadar</span>
   </div>
   <div class="nav-links">
-    <a href="#reviews">Avis clients</a>
+    <a href="#" onclick="scrollToTabs('free'); return false;">Recherche gratuite</a>
     <a href="#faq">FAQ</a>
     <a href="#carnets">Carnets</a>
     <a href="#" class="nav-cta" onclick="scrollToTabs('paid'); return false;">✨ Créer mon itinéraire</a>
@@ -5419,7 +5434,7 @@
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#reviews" onclick="closeMenu()">⭐ Avis clients</a>
+  <a href="#" onclick="scrollToTabs('free'); closeMenu(); return false;">🔍 Recherche gratuite</a>
   <a href="#faq" onclick="closeMenu()">❓ FAQ</a>
   <a href="#carnets" onclick="closeMenu()">📔 Carnets</a>
   <a href="#" class="mobile-cta" onclick="scrollToTabs('paid'); closeMenu(); return false;">✨ Créer mon itinéraire</a>
@@ -5790,7 +5805,7 @@
           <div class="fp-step">
             <div class="fp-step-wrap">
               <div class="fp-dot" id="fp4">4</div>
-              <div class="fp-label" id="fpl4">Paiement</div>
+              <div class="fp-label" id="fpl4">Confirmation</div>
             </div>
           </div>
         </div>
@@ -5985,10 +6000,10 @@
               <div class="total-price" id="sum-total">—</div>
             </div>
             <button type="submit" class="btn-pay" id="btnPay">
-              🔒 Valider et payer
+              ✨ Envoyer ma commande
             </button>
             <p style="text-align:center; font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:10px;">
-              Paiement 100% sécurisé • Email livré sous le délai indiqué
+              Vous recevrez un lien de paiement sécurisé par email • Livraison sous le délai indiqué
             </p>
           </div>
 
@@ -6014,9 +6029,9 @@
               <strong id="ss-total">—</strong>
             </div>
             <button class="sticky-pay" onclick="document.getElementById('btnPay').click()">
-              🔒 Valider et payer
+              ✨ Envoyer ma commande
             </button>
-            <p class="sticky-secure">Paiement 100% sécurisé</p>
+            <p class="sticky-secure">Lien de paiement sécurisé par email</p>
           </div>
           <div class="sticky-no-selection-hint" id="stickyHint" style="display:none;">
             💡 Renseignez votre email<br>pour finaliser la commande
@@ -6158,9 +6173,9 @@
 <!-- ── FLOATING ELEMENTS ── -->
 <button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Retour en haut">↑</button>
 
-<a id="waBtn" href="https://wa.me/33600000000" target="_blank">
+<a id="waBtn" href="mailto:monprestataire.app@gmail.com?subject=Contact%20TripAI">
   <span class="wa-icon">💬</span>
-  <span class="wa-text">Contacter sur WhatsApp</span>
+  <span class="wa-text">Nous contacter</span>
   <span class="wa-close" onclick="event.preventDefault();event.stopPropagation();document.getElementById('waBtn').style.display='none'">✕</span>
 </a>
 
@@ -6220,7 +6235,7 @@
 <div class="confirmation-page" id="confirmPage">
   <div class="confirm-icon">🌸</div>
   <h2 class="confirm-title">Merci pour votre confiance !</h2>
-  <p class="confirm-sub">Nos experts vont créer votre itinéraire personnalisé et vous l'envoyer à <strong id="confirmEmail"></strong>.</p>
+  <p class="confirm-sub">Votre commande a bien été envoyée ! Vous recevrez d'abord un lien de paiement sécurisé, puis votre itinéraire personnalisé, à <strong id="confirmEmail"></strong>.</p>
 
   <div class="confirm-delivery">
     <div class="label">Délai de livraison estimé</div>
@@ -6233,7 +6248,7 @@
     <div class="col"><span>Destination</span><strong id="co-dest">—</strong></div>
     <div class="col"><span>Dates</span><strong id="co-dates">—</strong></div>
     <div class="col"><span>Voyageurs</span><strong id="co-travelers">—</strong></div>
-    <div class="col"><span style="font-weight:700">Total payé</span><strong id="co-total" style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.1rem;">—</strong></div>
+    <div class="col"><span style="font-weight:700">Total à régler</span><strong id="co-total" style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.1rem;">—</strong></div>
   </div>
 
   <div class="share-row">
@@ -6292,46 +6307,46 @@
     <div class="carnets-plans fade-in">
       <div class="carnet-plan">
         <h4>Essentiel</h4>
-        <div class="plan-price">29€ <small>/ carnet</small></div>
-        <div class="plan-desc">L'essentiel pour partager</div>
+        <div class="plan-price">9,99€ <small>/ carnet</small></div>
+        <div class="plan-desc">Prix de lancement 🌸</div>
         <ul>
-          <li>Jusqu'à 5 étapes</li>
-          <li>30 photos max</li>
+          <li>Jusqu'à 30 photos</li>
           <li>Lien privé à partager</li>
           <li>Couverture avec vos photos</li>
           <li>Itinéraire interactif</li>
+          <li>Réactions ❤️ de vos proches</li>
         </ul>
-        <a href="#" class="plan-cta plan-cta-outline">Commander →</a>
+        <a href="mailto:monprestataire.app@gmail.com?subject=Commande%20carnet%20de%20voyage%20%E2%80%94%20Essentiel%20(9%2C99%E2%82%AC)&body=Bonjour%20Leila%20!%0A%0AJe%20souhaite%20commander%20un%20carnet%20de%20voyage%20Essentiel.%0A%0AMa%20destination%20%3A%20%0AMes%20dates%20%3A%20%0A%0AMerci%20!" class="plan-cta plan-cta-outline">Commander →</a>
       </div>
 
       <div class="carnet-plan featured">
         <div class="plan-badge">Le plus choisi ⭐</div>
         <h4>Premium</h4>
-        <div class="plan-price">49€ <small>/ carnet</small></div>
+        <div class="plan-price">19,99€ <small>/ carnet</small></div>
         <div class="plan-desc">L'expérience complète</div>
         <ul>
-          <li>Étapes illimitées</li>
-          <li>Photos illimitées</li>
+          <li>Jusqu'à 50 photos</li>
           <li>Livre d'or pour la famille</li>
+          <li>Vos proches peuvent joindre leurs photos</li>
           <li>Couverture personnalisée</li>
           <li>Itinéraire interactif</li>
           <li>Réactions ❤️ par étape</li>
         </ul>
-        <a href="#" class="plan-cta plan-cta-fill">Commander →</a>
+        <a href="mailto:monprestataire.app@gmail.com?subject=Commande%20carnet%20de%20voyage%20%E2%80%94%20Premium%20(19%2C99%E2%82%AC)&body=Bonjour%20Leila%20!%0A%0AJe%20souhaite%20commander%20un%20carnet%20de%20voyage%20Premium.%0A%0AMa%20destination%20%3A%20%0AMes%20dates%20%3A%20%0A%0AMerci%20!" class="plan-cta plan-cta-fill">Commander →</a>
       </div>
 
       <div class="carnet-plan">
-        <h4>Souvenir</h4>
-        <div class="plan-price">69€ <small>/ carnet</small></div>
-        <div class="plan-desc">Le keepsake parfait</div>
+        <h4>Sur mesure</h4>
+        <div class="plan-price">Sur devis</div>
+        <div class="plan-desc">Grands voyages & événements</div>
         <ul>
+          <li>Plus de 50 photos</li>
           <li>Tout le forfait Premium</li>
-          <li>Version PDF imprimable</li>
-          <li>Mise en page premium</li>
+          <li>Mariages, lunes de miel, tours du monde</li>
           <li>Idéal en cadeau</li>
-          <li>Livraison en 48h</li>
+          <li>Réponse sous 24h</li>
         </ul>
-        <a href="#" class="plan-cta plan-cta-outline">Commander →</a>
+        <a href="mailto:monprestataire.app@gmail.com?subject=Demande%20de%20devis%20%E2%80%94%20Carnet%20sur%20mesure&body=Bonjour%20Leila%20!%0A%0AJe%20souhaite%20un%20carnet%20sur%20mesure.%0A%0AMon%20projet%20%3A%20%0ANombre%20de%20photos%20environ%20%3A%20%0A%0AMerci%20!" class="plan-cta plan-cta-outline">Demander un devis →</a>
       </div>
     </div>
   </div>
@@ -6342,17 +6357,30 @@
   <div class="footer-logo">Trip<span>AI</span></div>
   <div class="footer-tagline">Votre voyage, pensé pour vous ✨</div>
   <div class="footer-links">
-    <a href="#">Accueil</a>
-    <a href="#">Nos formules</a>
-    <a href="#">Avis clients</a>
-    <a href="#">FAQ</a>
-    <a href="#">Contact</a>
-    <a href="#">Mentions légales</a>
+    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">Accueil</a>
+    <a href="#" onclick="scrollToTabs('paid'); return false;">Nos formules</a>
+    <a href="#carnets">Carnets de voyage</a>
+    <a href="#faq">FAQ</a>
+    <a href="mailto:monprestataire.app@gmail.com?subject=Contact%20TripAI">Contact</a>
+    <a href="#" onclick="document.getElementById('legalModal').style.display='flex'; return false;">Mentions légales</a>
   </div>
   <div class="footer-bottom">
-    Créé avec 🌸 par <a href="#" style="color:var(--rose)">LeilaTripRadar</a> • @leilatripradar &nbsp;|&nbsp; © 2025 TripAI — Tous droits réservés
+    Créé avec 🌸 par <a href="https://www.tiktok.com/@leilatripradar" target="_blank" rel="noopener" style="color:var(--rose)">LeilaTripRadar</a> • @leilatripradar &nbsp;|&nbsp; © 2026 TripAI — Tous droits réservés
   </div>
 </footer>
+
+<!-- ── MENTIONS LÉGALES ── -->
+<div id="legalModal" style="display:none;position:fixed;inset:0;background:rgba(45,27,37,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:var(--bg,#FFF8F9);color:var(--dark,#2D1B25);max-width:520px;width:100%;max-height:80vh;overflow-y:auto;border-radius:18px;padding:28px;font-size:0.85rem;line-height:1.6;">
+    <h3 style="font-family:'Syne',sans-serif;margin-bottom:14px;">Mentions légales</h3>
+    <p><strong>Éditeur du site :</strong> TripAI, service proposé par LeilaTripRadar.<br>
+    Contact : <a href="mailto:monprestataire.app@gmail.com" style="color:var(--rose)">monprestataire.app@gmail.com</a></p>
+    <p style="margin-top:10px;"><strong>Hébergement :</strong> Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis — vercel.com</p>
+    <p style="margin-top:10px;"><strong>Données personnelles :</strong> les informations transmises via les formulaires (email, détails du voyage) servent uniquement à traiter votre demande. Elles ne sont ni revendues ni partagées. Vous pouvez demander leur suppression à tout moment par email.</p>
+    <p style="margin-top:10px;"><strong>Cookies :</strong> ce site n'utilise pas de cookies publicitaires. Vos préférences (thème sombre) sont stockées localement dans votre navigateur.</p>
+    <button onclick="document.getElementById('legalModal').style.display='none'" style="margin-top:18px;background:var(--grad,#C8748A);color:#fff;border:none;border-radius:10px;padding:10px 22px;cursor:pointer;font-weight:700;">Fermer</button>
+  </div>
+</div>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────
@@ -6584,7 +6612,21 @@ function toggleChip(chip) {
 }
 
 // ── PAID FORM SUBMIT ───────────────────────────────────────────
-function submitPaid(e) {
+// Adresse qui reçoit les commandes (service FormSubmit, sans compte)
+const ORDER_EMAIL = 'monprestataire.app@gmail.com';
+
+function collectTravelers() {
+  return Array.from(document.querySelectorAll('.traveler-card')).map((card, i) => {
+    const inputs = Array.from(card.querySelectorAll('input, select')).map(el => {
+      if (el.type === 'checkbox') return el.checked ? (el.value || el.nextElementSibling?.textContent?.trim()) : null;
+      return el.value || null;
+    }).filter(Boolean);
+    const prefs = Array.from(card.querySelectorAll('.pref-chip.selected, .chip.selected, [class*="chip"][class*="active"]')).map(c => c.textContent.trim());
+    return 'Voyageur ' + (i + 1) + ' : ' + inputs.join(', ') + (prefs.length ? ' — Préférences : ' + prefs.join(' ') : '');
+  }).join('\n');
+}
+
+async function submitPaid(e) {
   e.preventDefault();
   if (!selectedFormula) {
     shakeElement(document.querySelector('.formula-grid'));
@@ -6625,17 +6667,63 @@ function submitPaid(e) {
     setTimeout(() => document.getElementById(id).classList.add('done'), 700 + i * 800);
   });
 
-  setTimeout(() => {
-    overlay.classList.remove('visible');
-    steps.forEach(id => document.getElementById(id).classList.remove('done'));
-    document.getElementById('mainContent').style.display = 'none';
-    document.querySelectorAll('footer, .newsletter-section').forEach(el => el.style.display = 'none');
-    document.getElementById('confirmEmail').textContent   = email;
-    document.getElementById('confirmDelivery').textContent = 'Sous ' + delivery;
-    document.getElementById('confirmPage').classList.add('visible');
-    window.scrollTo({ top: 0 });
-    launchConfetti(3500);
-  }, 700 + steps.length * 800 + 400);
+  // Envoi réel de la commande par email (FormSubmit)
+  const val = id => (document.getElementById(id) || {}).value || '—';
+  const orderPayload = {
+    _subject: '🌸 Commande TripAI — ' + f.name + ' — ' + dest,
+    _template: 'table',
+    Formule: f.name + ' (' + total + ')',
+    'Email client': email,
+    'Ville de départ': val('p-depart'),
+    Destination: dest,
+    Dates: (date1 && date2) ? date1 + ' → ' + date2 : '—',
+    Voyageurs: tCount + '\n' + collectTravelers(),
+    'Budget vol': val('p-flight'),
+    'Budget logement': val('p-lodging'),
+    'Budget global': val('p-budget'),
+    Confort: val('p-comfort'),
+    'Option vols & hôtels': (cb && cb.checked) ? 'Oui (+' + f.optExtra + '€)' : 'Non',
+    Notes: val('p-notes'),
+    'Délai promis': delivery,
+  };
+
+  const minAnimation = new Promise(res => setTimeout(res, 700 + steps.length * 800 + 400));
+  let sendOk = false;
+  try {
+    const resp = await fetch('https://formsubmit.co/ajax/' + ORDER_EMAIL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(orderPayload),
+    });
+    sendOk = resp.ok;
+  } catch (err) {
+    sendOk = false;
+  }
+  await minAnimation;
+
+  overlay.classList.remove('visible');
+  steps.forEach(id => document.getElementById(id).classList.remove('done'));
+
+  if (!sendOk) {
+    // Échec réseau : proposer l'envoi manuel par email, ne pas afficher de fausse confirmation
+    const bodyTxt = Object.entries(orderPayload).filter(([k]) => !k.startsWith('_'))
+      .map(([k, v]) => k + ' : ' + v).join('\n');
+    const mailto = 'mailto:' + ORDER_EMAIL +
+      '?subject=' + encodeURIComponent('Commande TripAI — ' + f.name + ' — ' + dest) +
+      '&body=' + encodeURIComponent(bodyTxt);
+    if (confirm("Oups, l'envoi automatique a échoué. Voulez-vous nous envoyer votre commande par email ? (votre récapitulatif est déjà prêt)")) {
+      window.location.href = mailto;
+    }
+    return;
+  }
+
+  document.getElementById('mainContent').style.display = 'none';
+  document.querySelectorAll('footer, .newsletter-section').forEach(el => el.style.display = 'none');
+  document.getElementById('confirmEmail').textContent   = email;
+  document.getElementById('confirmDelivery').textContent = 'Sous ' + delivery;
+  document.getElementById('confirmPage').classList.add('visible');
+  window.scrollTo({ top: 0 });
+  launchConfetti(3500);
 }
 
 function goBack() {
