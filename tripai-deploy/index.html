@@ -5421,20 +5421,6 @@
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <button id="darkToggle" onclick="toggleDark()" title="Mode sombre">🌙</button>
-    <div class="notif-bell-wrap" id="notifWrap">
-      <button class="notif-bell" onclick="toggleNotifPanel()" title="Notifications">🔔</button>
-      <div class="notif-badge" id="notifBadge">3</div>
-      <div class="notif-panel" id="notifPanel">
-        <div class="notif-panel-header">
-          <span class="notif-panel-title">Notifications</span>
-          <button class="notif-clear" onclick="clearNotifs()">Tout marquer lu</button>
-        </div>
-        <div class="notif-item"><span class="notif-icon">✈️</span><div class="notif-text">Votre itinéraire Tokyo est prêt ! Vérifiez votre email.<span class="notif-time">il y a 2 min</span></div></div>
-        <div class="notif-item"><span class="notif-icon">⚡</span><div class="notif-text">Vente flash — VIP à -20% pendant encore 2h !<span class="notif-time">il y a 15 min</span></div></div>
-        <div class="notif-item"><span class="notif-icon">🎁</span><div class="notif-text">Offre parrainage : invitez un ami et gagnez 5€.<span class="notif-time">il y a 1h</span></div></div>
-      </div>
-    </div>
-    <div class="nav-status">En ligne ✨</div>
     <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -6261,8 +6247,8 @@
   </div>
 
   <div class="share-row">
-    <a class="share-btn share-wa" href="https://wa.me/?text=Je%20viens%20de%20commander%20mon%20itinéraire%20sur%20TripAI%20!%20🌸%20tripai.fr" target="_blank">💬 WhatsApp</a>
-    <a class="share-btn share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://tripai.fr" target="_blank">📘 Facebook</a>
+    <a class="share-btn share-wa" href="https://wa.me/?text=Je%20viens%20de%20commander%20mon%20itinéraire%20sur%20TripAI%20!%20🌸%20https%3A%2F%2Ftripai-phi.vercel.app" target="_blank">💬 WhatsApp</a>
+    <a class="share-btn share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://tripai-phi.vercel.app" target="_blank">📘 Facebook</a>
     <a class="share-btn share-tw" href="https://twitter.com/intent/tweet?text=Je%20viens%20de%20planifier%20mon%20voyage%20avec%20TripAI%20🌸✈️%20https%3A%2F%2Ftripai-phi.vercel.app" target="_blank">🐦 Twitter</a>
     <button class="share-btn share-copy" onclick="copyLink()">🔗 Copier le lien</button>
   </div>
@@ -8673,7 +8659,7 @@ function generateReferralCode() {
 }
 function copyReferral() {
   const code = document.getElementById('referralCode')?.textContent || '';
-  navigator.clipboard.writeText('https://tripai.fr?ref=' + code).then(() => {
+  navigator.clipboard.writeText('https://tripai-phi.vercel.app?ref=' + code).then(() => {
     const btn = document.querySelector('.referral-copy');
     unlockAchievement('sharer');
     btn.textContent = '✓ Lien copié !';
@@ -9240,7 +9226,7 @@ const CHAT_RESPONSES = {
   'Quelle formule choisir ?':'Tout dépend de votre voyage 😊\n• Week-end ou 5 jours → Basique (4,99€)\n• 1-2 semaines → Complet (9,99€)\n• Voyage long ou multi-villes → VIP (19,99€)',
 };
 const CHAT_FALLBACK = [
-  'Bonne question ! Pour y répondre au mieux, je vous invite à nous écrire à contact@tripai.fr 🌸',
+  'Bonne question ! Pour y répondre au mieux, je vous invite à nous écrire à monprestataire.app@gmail.com ou sur WhatsApp 🌸',
   'Je transmets votre message à notre équipe. En attendant, n\'hésitez pas à consulter notre FAQ !',
   'Merci pour votre message ! Notre équipe vous répond généralement sous quelques heures.',
 ];
@@ -9339,7 +9325,7 @@ function submitNewsletter(e) {
 
 // ── SHARE / COPY ────────────────────────────────────────────────
 function copyLink() {
-  navigator.clipboard.writeText('https://tripai.fr').then(() => {
+  navigator.clipboard.writeText('https://tripai-phi.vercel.app').then(() => {
     const el = document.getElementById('copyConfirm');
     el.style.display = 'block';
     setTimeout(() => el.style.display = 'none', 3000);
@@ -9573,7 +9559,7 @@ function init() {
   // Scroll animations
   initScrollAnimations();
   // Toasts
-  startToasts();
+  // startToasts() retiré : fausses notifications d'achat supprimées
   // Inline validation
   attachValidation();
   // Dark mode
@@ -9626,7 +9612,7 @@ function init() {
   // Keyboard shortcuts
   initKeyboardShortcuts();
   // Notification panel
-  initNotifPanel();
+  // initNotifPanel() retiré : cloche de notifications factice supprimée
   // Loyalty program
   initLoyalty();
   // Recently viewed
