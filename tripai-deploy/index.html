@@ -5838,7 +5838,7 @@
           <div class="formula-card" id="card-vip" onclick="selectFormula('vip')">
             <div class="selected-check">✓</div>
             <div class="formula-name">VIP 👑</div>
-            <div class="formula-price"><sup>€</sup>19,99</div>
+            <div class="formula-price"><sup>€</sup>24,99</div>
             <ul class="formula-features">
               <li>Jusqu'à 3 semaines</li>
               <li class="incl">✦ Vols & hôtels INCLUS</li>
@@ -5982,7 +5982,7 @@
               ✨ Envoyer ma commande
             </button>
             <p style="text-align:center; font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:10px;">
-              Vous recevrez un lien de paiement sécurisé par email • Livraison sous le délai indiqué
+              Paiement sécurisé par Stripe • Livraison sous le délai indiqué
             </p>
           </div>
 
@@ -6389,9 +6389,9 @@ function aff(url, param, value) {
 const PREFS = ['🏖️ Plage','🎉 Fête','😌 Détente','🏛️ Culture','🌿 Nature','🍴 Gastro','🛍️ Shopping','⚽ Sports'];
 
 const FORMULAS = {
-  basic:    { name:'Basique',  price:4.99,  optExtra:5,   delivery:'12 heures' },
-  complete: { name:'Complet',  price:9.99,  optExtra:8,   delivery:'24 heures' },
-  vip:      { name:'VIP 👑',   price:19.99, optExtra:0,   delivery:'48 heures' },
+  basic:    { name:'Basique',  price:4.99,  optExtra:5,   delivery:'12 heures', stripeLink:'https://buy.stripe.com/4gMcN70NP5ZvcFN54kbbG00', stripeLinkExtra:'https://buy.stripe.com/8x200l0NP1Jf0X58gwbbG01' },
+  complete: { name:'Complet',  price:9.99,  optExtra:8,   delivery:'24 heures', stripeLink:'https://buy.stripe.com/aFaeVf8gh3RneNVgN2bbG02', stripeLinkExtra:'https://buy.stripe.com/14AfZjeEFdrX49heEUbbG03' },
+  vip:      { name:'VIP 👑',   price:24.99, optExtra:0,   delivery:'48 heures', stripeLink:'https://buy.stripe.com/8x228t1RTafL5dlgN2bbG04' },
 };
 
 // ── TABS ───────────────────────────────────────────────────────
@@ -6716,6 +6716,14 @@ async function submitPaid(e) {
     return;
   }
 
+  // Redirection vers Stripe Payment Link si configuré
+  const useExtra = (selectedFormula !== 'vip' && cb && cb.checked && f.stripeLinkExtra);
+  const payLink = useExtra ? f.stripeLinkExtra : f.stripeLink;
+  if (payLink) {
+    window.location.href = payLink + '?prefilled_email=' + encodeURIComponent(email);
+    return;
+  }
+  // Fallback : page de confirmation classique (pas de Stripe configuré)
   document.getElementById('mainContent').style.display = 'none';
   document.querySelectorAll('footer, .newsletter-section').forEach(el => el.style.display = 'none');
   document.getElementById('confirmEmail').textContent   = email;
@@ -8060,7 +8068,7 @@ function renderAchievements() {
 // ── ORDER HISTORY ─────────────────────────────────────────────────
 const MOCK_ORDERS = [
   { emoji:'🗾', dest:'Tokyo, Japon',       formula:'Complet',  date:'12 juin 2025', status:'delivered',  price:'9,99€' },
-  { emoji:'🌴', dest:'Bali, Indonésie',    formula:'VIP 👑',   date:'28 mars 2025', status:'delivered',  price:'19,99€' },
+  { emoji:'🌴', dest:'Bali, Indonésie',    formula:'VIP 👑',   date:'28 mars 2025', status:'delivered',  price:'24,99€' },
   { emoji:'🏛️', dest:'Rome, Italie',      formula:'Basique',  date:'5 jan. 2025',  status:'delivered',  price:'4,99€'  },
 ];
 function renderOrders() {
@@ -9206,7 +9214,7 @@ function initCarouselDots() {
 const CHAT_RESPONSES = {
   'Comment ça marche ?':     'Vous choisissez une formule, remplissez le formulaire avec vos envies, et nos experts créent votre itinéraire sur mesure. Vous le recevez par email dans les délais indiqués 🌸',
   'Délai de livraison ?':    'Tout dépend de la formule choisie :\n⚡ VIP → 12h\n✅ Complet → 24h\n📋 Basique → 48h',
-  'Quelle formule choisir ?':'Tout dépend de votre voyage 😊\n• Week-end ou 5 jours → Basique (4,99€)\n• 1-2 semaines → Complet (9,99€)\n• Voyage long ou multi-villes → VIP (19,99€)',
+  'Quelle formule choisir ?':'Tout dépend de votre voyage 😊\n• Week-end ou 5 jours → Basique (4,99€)\n• 1-2 semaines → Complet (9,99€)\n• Voyage long ou multi-villes → VIP (24,99€)',
 };
 const CHAT_FALLBACK = [
   'Bonne question ! Pour y répondre au mieux, je vous invite à nous écrire à monprestataire.app@gmail.com ou sur WhatsApp 🌸',
