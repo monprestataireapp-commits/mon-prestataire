@@ -5815,7 +5815,7 @@
               <li>Budget estimé inclus</li>
               <li class="extra">Option vols & hôtels +5€</li>
             </ul>
-            <div class="formula-delivery">⏱ Livraison sous 48h</div>
+            <div class="formula-delivery">⏱ Livraison sous 12h</div>
           </div>
 
           <!-- COMPLET -->
@@ -5846,7 +5846,7 @@
               <li class="incl">✦ Suivi WhatsApp 7j</li>
               <li class="incl">✦ Modifications incluses</li>
             </ul>
-            <div class="formula-delivery">⏱ Livraison sous 12h</div>
+            <div class="formula-delivery">⏱ Livraison sous 48h</div>
           </div>
         </div>
 
@@ -6389,9 +6389,9 @@ function aff(url, param, value) {
 const PREFS = ['🏖️ Plage','🎉 Fête','😌 Détente','🏛️ Culture','🌿 Nature','🍴 Gastro','🛍️ Shopping','⚽ Sports'];
 
 const FORMULAS = {
-  basic:    { name:'Basique',  price:4.99,  optExtra:5,   delivery:'48 heures' },
+  basic:    { name:'Basique',  price:4.99,  optExtra:5,   delivery:'12 heures' },
   complete: { name:'Complet',  price:9.99,  optExtra:8,   delivery:'24 heures' },
-  vip:      { name:'VIP 👑',   price:19.99, optExtra:0,   delivery:'12 heures' },
+  vip:      { name:'VIP 👑',   price:19.99, optExtra:0,   delivery:'48 heures' },
 };
 
 // ── TABS ───────────────────────────────────────────────────────
@@ -9317,9 +9317,9 @@ function copyLink() {
 
 // ── STICKY SIDEBAR ──────────────────────────────────────────────
 const FORMULA_FEATURES = {
-  basic:    ['Programme 3–5 jours', 'Budget estimé inclus', 'Livraison sous 48h'],
+  basic:    ['Programme 3–5 jours', 'Budget estimé inclus', 'Livraison sous 12h'],
   complete: ['Programme 7–14 jours', 'Budget détaillé', 'Activités par profil', 'Astuces & bons plans', 'Livraison sous 24h'],
-  vip:      ['Jusqu\'à 3 semaines', 'Vols & hôtels INCLUS', 'Multi-villes INCLUS', 'Suivi WhatsApp 7j', 'Modifications incluses', 'Livraison sous 12h'],
+  vip:      ['Jusqu\'à 3 semaines', 'Vols & hôtels INCLUS', 'Multi-villes INCLUS', 'Suivi WhatsApp 7j', 'Modifications incluses', 'Livraison sous 48h'],
 };
 
 function updateStickySidebar() {
