@@ -17,6 +17,8 @@ const config: Config = {
       fontFamily: {
         syne: ["Syne", "sans-serif"],
         inter: ["Inter", "sans-serif"],
+        cursive: ["'Dancing Script'", "'Satisfy'", "cursive"],
+        serif: ["Georgia", "'Times New Roman'", "serif"],
       },
     },
   },

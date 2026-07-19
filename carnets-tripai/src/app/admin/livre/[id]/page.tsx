@@ -11,9 +11,15 @@ type Element = {
   content?: string;
   size?: "small" | "medium" | "large" | "full";
   textSize?: "sm" | "md" | "lg" | "xl";
+  font?: "sans" | "serif" | "cursive";
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  color?: string;
   x?: number;
   y?: number;
   w?: number;
+  h?: number;
 };
 
 type PageLivre = {
@@ -49,6 +55,28 @@ const TEXT_SIZE_CLASSES: Record<string, string> = {
   lg: "text-base",
   xl: "text-lg",
 };
+
+const FONT_LABELS: Record<string, string> = {
+  sans: "Sans-serif",
+  serif: "Serif",
+  cursive: "Cursive",
+};
+
+const FONT_CLASSES: Record<string, string> = {
+  sans: "font-sans",
+  serif: "font-serif",
+  cursive: "font-cursive",
+};
+
+const TEXT_COLORS: { value: string; label: string }[] = [
+  { value: "#5A4450", label: "Prune" },
+  { value: "#2D1B25", label: "Noir" },
+  { value: "#C8748A", label: "Rose" },
+  { value: "#C8A951", label: "Doré" },
+  { value: "#4A7C6F", label: "Vert" },
+  { value: "#3B6B9E", label: "Bleu" },
+  { value: "#FFFFFF", label: "Blanc" },
+];
 
 const LEGACY_WIDTHS: Record<string, number> = {
   small: 30,
@@ -109,6 +137,7 @@ function PageCanvas({
     origX: number;
     origY: number;
     origW: number;
+    origH: number;
   } | null>(null);
 
   const persist = useCallback(
@@ -152,6 +181,14 @@ function PageCanvas({
       return [...prev.filter((x) => x.id !== elId), me];
     });
 
+    let origH = el.h ?? 0;
+    if (origH === 0 && mode === "resize" && canvasRef.current) {
+      const elDom = canvasRef.current.querySelector(`[data-elid-wrap="${elId}"]`);
+      if (elDom && canvasRef.current) {
+        origH = (elDom.getBoundingClientRect().height / canvasRef.current.getBoundingClientRect().height) * 100;
+      }
+    }
+
     dragRef.current = {
       elId,
       mode,
@@ -160,6 +197,7 @@ function PageCanvas({
       origX: el.x!,
       origY: el.y!,
       origW: el.w!,
+      origH,
     };
     setDragId(elId);
 
@@ -180,7 +218,11 @@ function PageCanvas({
               y: clamp(d.origY + dy, 0, 96),
             };
           }
-          return { ...el2, w: clamp(d.origW + dx, 10, 100) };
+          return {
+            ...el2,
+            w: clamp(d.origW + dx, 10, 100),
+            h: clamp(d.origH + dy, 3, 100),
+          };
         })
       );
     };
@@ -339,6 +381,7 @@ function PageCanvas({
         {els.map((el) => (
           <div
             key={el.id}
+            data-elid-wrap={el.id}
             className={`absolute group ${
               dragId === el.id ? "ring-2 ring-rose z-30" : "hover:ring-1 hover:ring-rose/40"
             } rounded-lg`}
@@ -346,32 +389,93 @@ function PageCanvas({
               left: `${el.x}%`,
               top: `${el.y}%`,
               width: `${el.w}%`,
+              ...(el.h ? { height: `${el.h}%` } : {}),
               touchAction: "none",
             }}
           >
             {/* Controls */}
             <div
-              className={`absolute -top-3 right-0 z-20 flex gap-1 transition ${
+              className={`absolute -top-7 right-0 z-20 flex gap-1 items-center transition ${
                 dragId === el.id ? "opacity-0" : "opacity-0 group-hover:opacity-100"
               }`}
             >
               {el.type === "text" && (
-                <select
-                  value={el.textSize || "md"}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onChange={(e) =>
-                    updateElement(el.id, {
-                      textSize: e.target.value as Element["textSize"],
-                    })
-                  }
-                  className="text-[10px] bg-white shadow rounded px-1 outline-none"
-                >
-                  {Object.entries(TEXT_SIZE_LABELS).map(([k, v]) => (
-                    <option key={k} value={k}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
+                <>
+                  <select
+                    value={el.textSize || "md"}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onChange={(e) =>
+                      updateElement(el.id, {
+                        textSize: e.target.value as Element["textSize"],
+                      })
+                    }
+                    className="text-[10px] bg-white shadow rounded px-1 outline-none"
+                  >
+                    {Object.entries(TEXT_SIZE_LABELS).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={el.font || "sans"}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onChange={(e) =>
+                      updateElement(el.id, {
+                        font: e.target.value as Element["font"],
+                      })
+                    }
+                    className="text-[10px] bg-white shadow rounded px-1 outline-none"
+                  >
+                    {Object.entries(FONT_LABELS).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => updateElement(el.id, { bold: !el.bold })}
+                    className={`w-5 h-5 text-[11px] font-bold rounded shadow ${
+                      el.bold ? "bg-rose text-white" : "bg-white text-[#5A4450]"
+                    }`}
+                  >
+                    B
+                  </button>
+                  <button
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => updateElement(el.id, { italic: !el.italic })}
+                    className={`w-5 h-5 text-[11px] italic rounded shadow ${
+                      el.italic ? "bg-rose text-white" : "bg-white text-[#5A4450]"
+                    }`}
+                  >
+                    I
+                  </button>
+                  <button
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => updateElement(el.id, { underline: !el.underline })}
+                    className={`w-5 h-5 text-[11px] underline rounded shadow ${
+                      el.underline ? "bg-rose text-white" : "bg-white text-[#5A4450]"
+                    }`}
+                  >
+                    U
+                  </button>
+                  <div className="flex gap-0.5" onPointerDown={(e) => e.stopPropagation()}>
+                    {TEXT_COLORS.map((c) => (
+                      <button
+                        key={c.value}
+                        onClick={() => updateElement(el.id, { color: c.value })}
+                        title={c.label}
+                        className={`w-4 h-4 rounded-full border ${
+                          (el.color || "#5A4450") === c.value
+                            ? "border-rose ring-1 ring-rose"
+                            : "border-gray-300"
+                        }`}
+                        style={{ backgroundColor: c.value }}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
               <button
                 onPointerDown={(e) => e.stopPropagation()}
@@ -388,7 +492,8 @@ function PageCanvas({
                 alt=""
                 draggable={false}
                 onPointerDown={(e) => startDrag(e, el.id, "move")}
-                className="w-full h-auto rounded-lg shadow-md cursor-move"
+                className="w-full rounded-lg shadow-md cursor-move object-cover"
+                style={el.h ? { height: "100%" } : {}}
               />
             ) : (
               <div
@@ -397,6 +502,7 @@ function PageCanvas({
                     ? "bg-white border border-rose"
                     : "bg-white/60 border border-rose/15"
                 }`}
+                style={el.h ? { height: "100%", overflow: "hidden" } : {}}
               >
                 <textarea
                   data-elid={el.id}
@@ -415,8 +521,15 @@ function PageCanvas({
                   placeholder="Votre texte ici…"
                   className={`w-full bg-transparent p-2 outline-none resize-none overflow-hidden ${
                     TEXT_SIZE_CLASSES[el.textSize || "md"]
-                  } text-[#5A4450] leading-relaxed`}
-                  rows={2}
+                  } ${FONT_CLASSES[el.font || "sans"]} leading-relaxed`}
+                  style={{
+                    color: el.color || "#5A4450",
+                    fontWeight: el.bold ? "bold" : "normal",
+                    fontStyle: el.italic ? "italic" : "normal",
+                    textDecoration: el.underline ? "underline" : "none",
+                    ...(el.h ? { height: "100%" } : {}),
+                  }}
+                  rows={el.h ? undefined : 2}
                 />
                 {editingId !== el.id && (
                   <div
@@ -431,7 +544,7 @@ function PageCanvas({
             {/* Resize handle */}
             <div
               onPointerDown={(e) => startDrag(e, el.id, "resize")}
-              className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border border-rose rounded-full shadow cursor-ew-resize transition ${
+              className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border border-rose rounded-full shadow cursor-nwse-resize transition ${
                 dragId === el.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
               }`}
               title="Redimensionner"

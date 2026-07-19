@@ -10,9 +10,15 @@ type Element = {
   content?: string;
   size?: "small" | "medium" | "large" | "full";
   textSize?: "sm" | "md" | "lg" | "xl";
+  font?: "sans" | "serif" | "cursive";
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  color?: string;
   x?: number;
   y?: number;
   w?: number;
+  h?: number;
 };
 
 type PageData = { id: string; ordre: number; elements: string };
@@ -102,19 +108,31 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
                 left: `${el.x}%`,
                 top: `${el.y}%`,
                 width: `${el.w}%`,
+                ...(el.h ? { height: `${el.h}%` } : {}),
               }}
             >
               {el.type === "photo" ? (
                 <img
                   src={el.url}
                   alt=""
-                  className="w-full h-auto rounded-lg"
-                  style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.12)" }}
+                  className="w-full rounded-lg"
+                  style={{
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.12)",
+                    ...(el.h ? { height: "100%", objectFit: "cover" as const } : {}),
+                  }}
                 />
               ) : (
                 <p
-                  className="text-[#5A4450] leading-relaxed whitespace-pre-wrap break-words"
-                  style={{ fontSize: TEXT_SIZE_MAP[el.textSize || "md"] }}
+                  className="leading-relaxed whitespace-pre-wrap break-words"
+                  style={{
+                    fontSize: TEXT_SIZE_MAP[el.textSize || "md"],
+                    color: el.color || "#5A4450",
+                    fontFamily: el.font === "cursive" ? "'Dancing Script', cursive" : el.font === "serif" ? "Georgia, 'Times New Roman', serif" : "inherit",
+                    fontWeight: el.bold ? "bold" : "normal",
+                    fontStyle: el.italic ? "italic" : "normal",
+                    textDecoration: el.underline ? "underline" : "none",
+                    ...(el.h ? { height: "100%", overflow: "hidden" } : {}),
+                  }}
                 >
                   {el.content}
                 </p>
@@ -143,8 +161,15 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
               />
             ) : (
               <p
-                className="text-[#5A4450] leading-relaxed"
-                style={{ fontSize: TEXT_SIZE_MAP[el.textSize || "md"] }}
+                className="leading-relaxed"
+                style={{
+                  fontSize: TEXT_SIZE_MAP[el.textSize || "md"],
+                  color: el.color || "#5A4450",
+                  fontFamily: el.font === "cursive" ? "'Dancing Script', cursive" : el.font === "serif" ? "Georgia, 'Times New Roman', serif" : "inherit",
+                  fontWeight: el.bold ? "bold" : "normal",
+                  fontStyle: el.italic ? "italic" : "normal",
+                  textDecoration: el.underline ? "underline" : "none",
+                }}
               >
                 {el.content}
               </p>
