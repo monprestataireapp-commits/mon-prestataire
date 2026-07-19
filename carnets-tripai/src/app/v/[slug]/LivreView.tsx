@@ -115,6 +115,8 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
                 top: `${el.y}%`,
                 width: `${el.w}%`,
                 ...(el.h ? { height: `${el.h}%` } : {}),
+                maxHeight: `${100 - (el.y || 0)}%`,
+                overflow: "hidden",
               }}
             >
               {el.type === "photo" ? (
@@ -225,15 +227,13 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
       case "content": {
         const elements: Element[] = JSON.parse(page.pageData!.elements || "[]");
         return (
-          <div className="absolute inset-0 bg-[#FFF8F9] p-3">
+          <div className="absolute inset-0 bg-[#FFF8F9]">
             {elements.length === 0 ? (
               <div className="flex items-center justify-center h-full text-[#8A7080] text-sm">
                 Page vide
               </div>
             ) : (
-              <div className="relative w-full h-full overflow-hidden">
-                {renderElements(elements)}
-              </div>
+              renderElements(elements)
             )}
           </div>
         );

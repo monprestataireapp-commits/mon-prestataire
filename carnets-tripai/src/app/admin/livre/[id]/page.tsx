@@ -380,7 +380,7 @@ function PageCanvas({
 
       {/* Free canvas — same 3:4 ratio as the public book page */}
       <div
-        className="mx-auto rounded-xl overflow-hidden bg-[#FFF8F9] border-2 border-dashed border-rose/20 select-none p-3"
+        className="mx-auto rounded-xl overflow-hidden bg-[#FFF8F9] border-2 border-dashed border-rose/20 select-none"
         style={{ width: "min(480px, 100%)", aspectRatio: "3 / 4" }}
       >
       <div
