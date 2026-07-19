@@ -177,6 +177,16 @@ function PageCanvas({
     persist(prev);
   }
 
+  // Auto-size all text areas to fit their content on load and whenever elements change
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const areas = canvasRef.current.querySelectorAll<HTMLTextAreaElement>("textarea[data-elid]");
+    areas.forEach((t) => {
+      t.style.height = "auto";
+      t.style.height = t.scrollHeight + "px";
+    });
+  }, [els]);
+
   function startDrag(
     e: React.PointerEvent,
     elId: string,
@@ -546,7 +556,7 @@ function PageCanvas({
                     ? "bg-white border border-rose"
                     : "bg-white/60 border border-rose/15"
                 }`}
-                style={el.h ? { height: "100%", overflow: "hidden" } : {}}
+                style={el.h ? { minHeight: "100%" } : {}}
               >
                 <textarea
                   data-elid={el.id}
@@ -573,9 +583,8 @@ function PageCanvas({
                     fontStyle: el.italic ? "italic" : "normal",
                     textDecoration: el.underline ? "underline" : "none",
                     textAlign: el.align || "left",
-                    ...(el.h ? { height: "100%" } : {}),
                   }}
-                  rows={el.h ? undefined : 2}
+                  rows={2}
                 />
                 {editingId !== el.id && (
                   <div

@@ -114,9 +114,8 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
                 left: `${el.x}%`,
                 top: `${el.y}%`,
                 width: `${el.w}%`,
-                ...(el.h ? { height: `${el.h}%` } : {}),
-                maxHeight: `${100 - (el.y || 0)}%`,
-                overflow: "hidden",
+                // Photos: fixed height for cropping. Text: never clip, always show full content.
+                ...(el.type === "photo" && el.h ? { height: `${el.h}%`, overflow: "hidden" } : {}),
               }}
             >
               {el.type === "photo" ? (
@@ -140,7 +139,6 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
                     fontStyle: el.italic ? "italic" : "normal",
                     textDecoration: el.underline ? "underline" : "none",
                     textAlign: el.align || "left",
-                    ...(el.h ? { height: "100%", overflow: "hidden" } : {}),
                   }}
                 >
                   {el.content}
