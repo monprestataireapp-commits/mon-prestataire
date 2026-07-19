@@ -380,9 +380,12 @@ function PageCanvas({
 
       {/* Free canvas — same 3:4 ratio as the public book page */}
       <div
-        ref={canvasRef}
-        className="relative mx-auto rounded-xl overflow-hidden bg-[#FFF8F9] border-2 border-dashed border-rose/20 select-none"
+        className="mx-auto rounded-xl overflow-hidden bg-[#FFF8F9] border-2 border-dashed border-rose/20 select-none p-3"
         style={{ width: "min(480px, 100%)", aspectRatio: "3 / 4" }}
+      >
+      <div
+        ref={canvasRef}
+        className="relative w-full h-full"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -594,6 +597,7 @@ function PageCanvas({
             />
           </div>
         ))}
+      </div>
       </div>
 
       {/* Add elements */}
