@@ -133,6 +133,7 @@ function PageCanvas({
   const [els, setEls] = useState<Element[]>(() =>
     withLayout(JSON.parse(page.elements || "[]"))
   );
+  const [history, setHistory] = useState<Element[][]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -162,8 +163,17 @@ function PageCanvas({
   );
 
   function apply(elements: Element[]) {
+    setHistory((prev) => [...prev, els]);
     setEls(elements);
     persist(elements);
+  }
+
+  function undo() {
+    if (history.length === 0) return;
+    const prev = history[history.length - 1];
+    setHistory((h) => h.slice(0, -1));
+    setEls(prev);
+    persist(prev);
   }
 
   function startDrag(
@@ -585,6 +595,14 @@ function PageCanvas({
           className="text-sm px-3 py-1.5 rounded-lg border border-dashed border-gold/30 text-gold hover:bg-gold/5 transition"
         >
           ✏️ Ajouter du texte
+        </button>
+        <button
+          onClick={undo}
+          disabled={history.length === 0}
+          className="text-sm px-3 py-1.5 rounded-lg border border-dashed border-white/30 text-white/70 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+          title="Annuler (Ctrl+Z)"
+        >
+          ↩ Annuler
         </button>
       </div>
     </div>
