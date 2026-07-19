@@ -43,17 +43,27 @@ type CarnetData = {
 };
 
 const TEXT_SIZE_LABELS: Record<string, string> = {
-  sm: "Petit",
-  md: "Normal",
-  lg: "Grand",
-  xl: "Très grand",
+  xs: "10px",
+  sm: "12px",
+  md: "14px",
+  lg: "16px",
+  xl: "20px",
+  "2xl": "24px",
+  "3xl": "30px",
+  "4xl": "36px",
+  "5xl": "48px",
 };
 
-const TEXT_SIZE_CLASSES: Record<string, string> = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base",
-  xl: "text-lg",
+const TEXT_SIZE_PX: Record<string, string> = {
+  xs: "10px",
+  sm: "12px",
+  md: "14px",
+  lg: "16px",
+  xl: "20px",
+  "2xl": "24px",
+  "3xl": "30px",
+  "4xl": "36px",
+  "5xl": "48px",
 };
 
 const FONT_LABELS: Record<string, string> = {
@@ -520,9 +530,10 @@ function PageCanvas({
                   lang="fr"
                   placeholder="Votre texte ici…"
                   className={`w-full bg-transparent p-2 outline-none resize-none overflow-hidden ${
-                    TEXT_SIZE_CLASSES[el.textSize || "md"]
-                  } ${FONT_CLASSES[el.font || "sans"]} leading-relaxed`}
+                    FONT_CLASSES[el.font || "sans"]
+                  } leading-relaxed`}
                   style={{
+                    fontSize: TEXT_SIZE_PX[el.textSize || "md"] || "14px",
                     color: el.color || "#5A4450",
                     fontWeight: el.bold ? "bold" : "normal",
                     fontStyle: el.italic ? "italic" : "normal",

@@ -46,10 +46,15 @@ const SIZE_MAP: Record<string, string> = {
 };
 
 const TEXT_SIZE_MAP: Record<string, string> = {
-  sm: "0.8rem",
-  md: "0.95rem",
-  lg: "1.15rem",
-  xl: "1.4rem",
+  xs: "10px",
+  sm: "12px",
+  md: "14px",
+  lg: "16px",
+  xl: "20px",
+  "2xl": "24px",
+  "3xl": "30px",
+  "4xl": "36px",
+  "5xl": "48px",
 };
 
 type BookPage = { type: "cover" | "content" | "guestbook" | "back"; pageData?: PageData };
