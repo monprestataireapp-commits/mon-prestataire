@@ -416,98 +416,104 @@ function PageCanvas({
           >
             {/* Controls */}
             <div
-              className={`absolute -top-7 right-0 z-20 flex gap-1 items-center transition ${
+              className={`absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full z-20 transition ${
                 dragId === el.id ? "opacity-0" : "opacity-0 group-hover:opacity-100"
               }`}
             >
+              <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1.5 flex flex-col gap-1 items-center">
               {el.type === "text" && (
                 <>
-                  <select
-                    value={el.textSize || "md"}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      updateElement(el.id, {
-                        textSize: e.target.value as Element["textSize"],
-                      })
-                    }
-                    className="text-[10px] bg-white shadow rounded px-1 outline-none"
-                  >
-                    {Object.entries(TEXT_SIZE_LABELS).map(([k, v]) => (
-                      <option key={k} value={k}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={el.font || "sans"}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      updateElement(el.id, {
-                        font: e.target.value as Element["font"],
-                      })
-                    }
-                    className="text-[10px] bg-white shadow rounded px-1 outline-none"
-                  >
-                    {Object.entries(FONT_LABELS).map(([k, v]) => (
-                      <option key={k} value={k}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onClick={() => updateElement(el.id, { bold: !el.bold })}
-                    className={`w-5 h-5 text-[11px] font-bold rounded shadow ${
-                      el.bold ? "bg-rose text-white" : "bg-white text-[#5A4450]"
-                    }`}
-                  >
-                    B
-                  </button>
-                  <button
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onClick={() => updateElement(el.id, { italic: !el.italic })}
-                    className={`w-5 h-5 text-[11px] italic rounded shadow ${
-                      el.italic ? "bg-rose text-white" : "bg-white text-[#5A4450]"
-                    }`}
-                  >
-                    I
-                  </button>
-                  <button
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onClick={() => updateElement(el.id, { underline: !el.underline })}
-                    className={`w-5 h-5 text-[11px] underline rounded shadow ${
-                      el.underline ? "bg-rose text-white" : "bg-white text-[#5A4450]"
-                    }`}
-                  >
-                    U
-                  </button>
-                  {(["left", "center", "right"] as const).map((a) => (
-                    <button
-                      key={a}
+                  <div className="flex gap-1 items-center">
+                    <select
+                      value={el.textSize || "md"}
                       onPointerDown={(e) => e.stopPropagation()}
-                      onClick={() => updateElement(el.id, { align: a })}
-                      className={`w-5 h-5 text-[11px] rounded shadow ${
-                        (el.align || "left") === a ? "bg-rose text-white" : "bg-white text-[#5A4450]"
-                      }`}
-                      title={a === "left" ? "Gauche" : a === "center" ? "Centré" : "Droite"}
+                      onChange={(e) =>
+                        updateElement(el.id, {
+                          textSize: e.target.value as Element["textSize"],
+                        })
+                      }
+                      className="text-[10px] bg-gray-50 rounded px-1 py-0.5 outline-none border border-gray-200"
                     >
-                      {a === "left" ? "⫷" : a === "center" ? "☰" : "⫸"}
+                      {Object.entries(TEXT_SIZE_LABELS).map(([k, v]) => (
+                        <option key={k} value={k}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={el.font || "sans"}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onChange={(e) =>
+                        updateElement(el.id, {
+                          font: e.target.value as Element["font"],
+                        })
+                      }
+                      className="text-[10px] bg-gray-50 rounded px-1 py-0.5 outline-none border border-gray-200"
+                    >
+                      {Object.entries(FONT_LABELS).map(([k, v]) => (
+                        <option key={k} value={k}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={() => updateElement(el.id, { bold: !el.bold })}
+                      className={`w-5 h-5 text-[11px] font-bold rounded ${
+                        el.bold ? "bg-rose text-white" : "bg-gray-50 text-[#5A4450] border border-gray-200"
+                      }`}
+                    >
+                      B
                     </button>
-                  ))}
-                  <div className="flex gap-0.5" onPointerDown={(e) => e.stopPropagation()}>
-                    {TEXT_COLORS.map((c) => (
+                    <button
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={() => updateElement(el.id, { italic: !el.italic })}
+                      className={`w-5 h-5 text-[11px] italic rounded ${
+                        el.italic ? "bg-rose text-white" : "bg-gray-50 text-[#5A4450] border border-gray-200"
+                      }`}
+                    >
+                      I
+                    </button>
+                    <button
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={() => updateElement(el.id, { underline: !el.underline })}
+                      className={`w-5 h-5 text-[11px] underline rounded ${
+                        el.underline ? "bg-rose text-white" : "bg-gray-50 text-[#5A4450] border border-gray-200"
+                      }`}
+                    >
+                      U
+                    </button>
+                  </div>
+                  <div className="flex gap-1 items-center">
+                    {(["left", "center", "right"] as const).map((a) => (
                       <button
-                        key={c.value}
-                        onClick={() => updateElement(el.id, { color: c.value })}
-                        title={c.label}
-                        className={`w-4 h-4 rounded-full border ${
-                          (el.color || "#5A4450") === c.value
-                            ? "border-rose ring-1 ring-rose"
-                            : "border-gray-300"
+                        key={a}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={() => updateElement(el.id, { align: a })}
+                        className={`w-5 h-5 text-[11px] rounded ${
+                          (el.align || "left") === a ? "bg-rose text-white" : "bg-gray-50 text-[#5A4450] border border-gray-200"
                         }`}
-                        style={{ backgroundColor: c.value }}
-                      />
+                        title={a === "left" ? "Gauche" : a === "center" ? "Centré" : "Droite"}
+                      >
+                        {a === "left" ? "⫷" : a === "center" ? "☰" : "⫸"}
+                      </button>
                     ))}
+                    <div className="w-px h-4 bg-gray-200" />
+                    <div className="flex gap-0.5" onPointerDown={(e) => e.stopPropagation()}>
+                      {TEXT_COLORS.map((c) => (
+                        <button
+                          key={c.value}
+                          onClick={() => updateElement(el.id, { color: c.value })}
+                          title={c.label}
+                          className={`w-4 h-4 rounded-full border ${
+                            (el.color || "#5A4450") === c.value
+                              ? "border-rose ring-1 ring-rose"
+                              : "border-gray-300"
+                          }`}
+                          style={{ backgroundColor: c.value }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </>
               )}
@@ -518,6 +524,7 @@ function PageCanvas({
               >
                 ✕
               </button>
+              </div>
             </div>
 
             {el.type === "photo" ? (
