@@ -15,6 +15,7 @@ type Element = {
   italic?: boolean;
   underline?: boolean;
   color?: string;
+  align?: "left" | "center" | "right";
   x?: number;
   y?: number;
   w?: number;
@@ -136,6 +137,7 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
                     fontWeight: el.bold ? "bold" : "normal",
                     fontStyle: el.italic ? "italic" : "normal",
                     textDecoration: el.underline ? "underline" : "none",
+                    textAlign: el.align || "left",
                     ...(el.h ? { height: "100%", overflow: "hidden" } : {}),
                   }}
                 >
@@ -174,6 +176,7 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
                   fontWeight: el.bold ? "bold" : "normal",
                   fontStyle: el.italic ? "italic" : "normal",
                   textDecoration: el.underline ? "underline" : "none",
+                  textAlign: el.align || "left",
                 }}
               >
                 {el.content}

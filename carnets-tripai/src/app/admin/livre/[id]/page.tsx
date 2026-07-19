@@ -16,6 +16,7 @@ type Element = {
   italic?: boolean;
   underline?: boolean;
   color?: string;
+  align?: "left" | "center" | "right";
   x?: number;
   y?: number;
   w?: number;
@@ -480,6 +481,19 @@ function PageCanvas({
                   >
                     U
                   </button>
+                  {(["left", "center", "right"] as const).map((a) => (
+                    <button
+                      key={a}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={() => updateElement(el.id, { align: a })}
+                      className={`w-5 h-5 text-[11px] rounded shadow ${
+                        (el.align || "left") === a ? "bg-rose text-white" : "bg-white text-[#5A4450]"
+                      }`}
+                      title={a === "left" ? "Gauche" : a === "center" ? "Centré" : "Droite"}
+                    >
+                      {a === "left" ? "⫷" : a === "center" ? "☰" : "⫸"}
+                    </button>
+                  ))}
                   <div className="flex gap-0.5" onPointerDown={(e) => e.stopPropagation()}>
                     {TEXT_COLORS.map((c) => (
                       <button
@@ -548,6 +562,7 @@ function PageCanvas({
                     fontWeight: el.bold ? "bold" : "normal",
                     fontStyle: el.italic ? "italic" : "normal",
                     textDecoration: el.underline ? "underline" : "none",
+                    textAlign: el.align || "left",
                     ...(el.h ? { height: "100%" } : {}),
                   }}
                   rows={el.h ? undefined : 2}
