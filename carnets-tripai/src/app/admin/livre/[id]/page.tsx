@@ -55,16 +55,18 @@ const TEXT_SIZE_LABELS: Record<string, string> = {
   "5xl": "48px",
 };
 
+// cqw = % of canvas width, so text scales with the book and matches the public view
+// exactly (same wrapping). Reference width = 480px canvas.
 const TEXT_SIZE_PX: Record<string, string> = {
-  xs: "10px",
-  sm: "12px",
-  md: "14px",
-  lg: "16px",
-  xl: "20px",
-  "2xl": "24px",
-  "3xl": "30px",
-  "4xl": "36px",
-  "5xl": "48px",
+  xs: "2.083cqw",
+  sm: "2.5cqw",
+  md: "2.917cqw",
+  lg: "3.333cqw",
+  xl: "4.167cqw",
+  "2xl": "5cqw",
+  "3xl": "6.25cqw",
+  "4xl": "7.5cqw",
+  "5xl": "10cqw",
 };
 
 const FONT_LABELS: Record<string, string> = {
@@ -396,6 +398,7 @@ function PageCanvas({
       <div
         ref={canvasRef}
         className="relative w-full h-full"
+        style={{ containerType: "inline-size" }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -577,7 +580,7 @@ function PageCanvas({
                     FONT_CLASSES[el.font || "sans"]
                   } leading-relaxed`}
                   style={{
-                    fontSize: TEXT_SIZE_PX[el.textSize || "md"] || "14px",
+                    fontSize: TEXT_SIZE_PX[el.textSize || "md"] || "2.917cqw",
                     color: el.color || "#5A4450",
                     fontWeight: el.bold ? "bold" : "normal",
                     fontStyle: el.italic ? "italic" : "normal",

@@ -46,16 +46,18 @@ const SIZE_MAP: Record<string, string> = {
   full: "100%",
 };
 
+// Sizes are expressed in cqw (% of the book page width) so the text scales with the
+// book and wraps exactly like in the editor. Reference width = 480px (editor canvas).
 const TEXT_SIZE_MAP: Record<string, string> = {
-  xs: "10px",
-  sm: "12px",
-  md: "14px",
-  lg: "16px",
-  xl: "20px",
-  "2xl": "24px",
-  "3xl": "30px",
-  "4xl": "36px",
-  "5xl": "48px",
+  xs: "2.083cqw",
+  sm: "2.5cqw",
+  md: "2.917cqw",
+  lg: "3.333cqw",
+  xl: "4.167cqw",
+  "2xl": "5cqw",
+  "3xl": "6.25cqw",
+  "4xl": "7.5cqw",
+  "5xl": "10cqw",
 };
 
 type BookPage = { type: "cover" | "content" | "guestbook" | "back"; pageData?: PageData };
@@ -225,7 +227,7 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
       case "content": {
         const elements: Element[] = JSON.parse(page.pageData!.elements || "[]");
         return (
-          <div className="absolute inset-0 bg-[#FFF8F9]">
+          <div className="absolute inset-0 bg-[#FFF8F9]" style={{ containerType: "inline-size" }}>
             {elements.length === 0 ? (
               <div className="flex items-center justify-center h-full text-[#8A7080] text-sm">
                 Page vide
@@ -276,7 +278,7 @@ export default function LivreView({ carnet, pages, dateDebut, dateFin, messages 
   return (
     <div className="min-h-screen bg-[#2D1B25] flex flex-col items-center justify-center py-8 px-4">
       <style>{`
-        .book-container { perspective: 1800px; width: min(480px, 90vw, 60vh); aspect-ratio: 3 / 4; }
+        .book-container { perspective: 1800px; width: min(480px, 92vw, 72vh); aspect-ratio: 3 / 4; }
         .book-page {
           position: absolute; inset: 0;
           border-radius: 4px 12px 12px 4px; overflow: hidden;
