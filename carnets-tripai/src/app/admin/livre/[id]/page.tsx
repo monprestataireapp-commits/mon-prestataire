@@ -298,7 +298,7 @@ function PageCanvas({
           ) as HTMLTextAreaElement | null;
           if (ta) {
             ta.focus();
-            ta.selectionStart = ta.value.length;
+            ta.selectionStart = ta.selectionEnd = ta.value.length;
           }
         }, 0);
       }
@@ -559,7 +559,7 @@ function PageCanvas({
                     ? "bg-white border border-rose"
                     : "bg-white/60 border border-rose/15"
                 }`}
-                style={el.h ? { minHeight: "100%" } : {}}
+                style={el.h ? { height: "100%" } : {}}
               >
                 <textarea
                   data-elid={el.id}
@@ -586,27 +586,32 @@ function PageCanvas({
                     fontStyle: el.italic ? "italic" : "normal",
                     textDecoration: el.underline ? "underline" : "none",
                     textAlign: el.align || "left",
+                    pointerEvents: editingId === el.id ? "auto" : "none",
                   }}
                   rows={2}
                 />
                 {editingId !== el.id && (
                   <div
-                    onPointerDown={(e) => textPointerDown(e, el.id)}
-                    className="absolute inset-0 cursor-move rounded-lg"
-                    title="Glisser pour déplacer · cliquer pour éditer"
+                    onPointerDown={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const clickY = (e.clientY - rect.top) / rect.height;
+                      if (clickY > 0.75) {
+                        startDrag(e, el.id, "resize");
+                      } else {
+                        textPointerDown(e, el.id);
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const hoverY = (e.clientY - rect.top) / rect.height;
+                      e.currentTarget.style.cursor = hoverY > 0.75 ? "ns-resize" : "move";
+                    }}
+                    className="absolute inset-0 rounded-lg"
+                    title="Haut : déplacer/éditer · Bas : redimensionner"
                   />
                 )}
               </div>
             )}
-
-            {/* Resize handle */}
-            <div
-              onPointerDown={(e) => startDrag(e, el.id, "resize")}
-              className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border border-rose rounded-full shadow cursor-nwse-resize transition ${
-                dragId === el.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-              }`}
-              title="Redimensionner"
-            />
           </div>
         ))}
       </div>
